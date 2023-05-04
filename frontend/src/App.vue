@@ -1,39 +1,70 @@
 <template>
     <div id="wrapper">
-        <nav class="navbar is-dark">
-            <div class="navbar-brand">
-                <router-link to="/" class="navbar-item"><strong>Home</strong></router-link>
+        <table v-if="showSidebar" class="sidebar">
+            <tr>
+                <td colspan="2">
+                    ---Profile Placeholder--- <span class="text-muted">#1234</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="sidebar-groups">
 
-                <a class="navbar-burger" @click="burgerMenuActive = !burgerMenuActive" aria-label="menu"
-                    aria-expanded="false" data-target="navbar-menu">
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                    <span aria-hidden="true"></span>
-                </a>
-            </div>
-            <div class="navbar-menu" id="navbar-menu" v-bind:class="{ 'is-active': burgerMenuActive }">
-                <div class="navbar-start">
-                    <router-link to="/about" class="navbar-item">About</router-link>
-                </div>
+                    <!--FOREACH BULLSHIT-->
 
-                <div class="navbar-end">
 
-                    <div class="navbar-item">
-                        <div class="buttons">
 
-                            <router-link to="/cart" class="button is-success">
-                                <span class="icon"><i class="fas fa-shopping-cart"></i></span>
-                                <span>Cart ({{ cartTotalLength }})</span>
-                            </router-link>
+              
+                        
+                           
+                    <v-btn height="80px" width="80px"  max-width="80" class="ma-1 rounded-circle">
+                        <img src="//placehold.it/80x80" class="rounded-circle">
+                    </v-btn>
+                    <v-btn height="80px" width="80px"  max-width="80" class="ma-1 rounded-circle">
+                        <img src="//placehold.it/80x80" class="rounded-circle">
+                    </v-btn>
+                    <v-btn height="80px" width="80px"  max-width="80" class="ma-1 rounded-circle">
+                        <img src="//placehold.it/80x80" class="rounded-circle">
+                    </v-btn>
+                    <v-btn height="80px" width="80px"  max-width="80" class="ma-1 rounded-circle">
+                        <img src="//placehold.it/80x80" class="rounded-circle">
+                    </v-btn>
 
-                            <router-link to="/login" class="button is-primary">Login</router-link>
-                            <router-link to="/register" class="button is-light">Register</router-link>
+                    <v-btn text="+" height="80px" width="80px" class="ma-1 large-text rounded-circle"></v-btn>
+                            
+                            
+                 
 
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </nav>
+
+                    <!--END FOREACH BULLSHIT-->
+
+
+                </td>
+
+                <td class="sidebar-friends">
+
+                    <!--FOREACH BULLSHIT-->
+
+                    <v-card class="mb-2" tile="">
+                        <v-row align="center" class="mt-1 mb-1">
+                            <v-col class="shrink">
+                                <v-img src="//placehold.it/80x80" max-width="80" class="ml-3 rounded-circle"></v-img>
+                            </v-col>
+                            <v-col>
+                                <v-card-text class="pa-0">username</v-card-text>
+                            </v-col>
+                        </v-row>
+                    </v-card>
+                    
+
+
+                    <!--END FOREACH BULLSHIT-->
+
+                </td>
+            </tr>
+
+        </table>
+
+
 
 
         <div class="lds-loading-bar" v-bind:class="{ 'is-loading': $store.state.isLoading }"></div>
@@ -44,108 +75,119 @@
             <router-view />
         </section>
 
-        <footer class="footer">
-            <p class="has-text-centered">Copyright (c) 2023</p>
-        </footer>
     </div>
 </template>
 
 <script>
-export default {
-    data() {
-        return {
-            burgerMenuActive: false,
-            cart: {
-                items: []
-            }
-        }
-    },
-    beforeCreate() {
-        this.$store.commit('initializeStore')
-    },
-    mounted() {
-        this.cart = this.$store.state.cart
-        console.log(this.$store.state.isLoading)
-    },
-    computed: {
-        cartTotalLength() {
-            let totalLength = 0
-
-            for (let i = 0; i < this.cart.items.length; i++) {
-                totalLength += this.cart.items[i].quantity
-            }
-
-            return totalLength
+    export default {
+        
+        data() {
+        
+        },
+        beforeCreate() {
+        
+        },
+        mounted() {
+            //console.log(this.$store.state.isLoading)
+            
+            
+        },
+        beforeUpdate() {
+            //console.log(!this.$store.state.isOnLoginPage)
+            this.showSidebar = !this.$store.state.isOnLoginPage
+            
+        },
+        computed: {
+            
+        },
+        methods: {
+          
+           
+          
         }
     }
-}
 </script>
 
 
 
 <style lang="scss">
-@import '../node_modules/bulma';
-
-
-.lds-loading-bar {
-    position: fixed;
-    animation: lds-loading-bar-2 0.1s normal forwards ease-in-out;
-    width: 100vw;
-    height: 6px;
-    margin-top: 50px;
-    background-color: #2ac811;
-
-    &.is-loading {
-        animation: lds-loading-bar 0.2s normal forwards ease-in-out;
-    }
-}
-
-@keyframes lds-loading-bar {
-    from {
-        transform: translateX(-100%);
-        opacity: 0;
+    html,
+    body {
+        margin: 0;
+        height: 100%;
     }
 
-    20% {
-        opacity: 1;
+    .text-muted {
+        color: #6c757d;
     }
 
-    to {
-        transform: translateX(-25%);
-    }
-}
-
-@keyframes lds-loading-bar-2 {
-    from {
-        transform: translateX(-25%);
+     .large-text {
+        font-size: 60px !important;
     }
 
-
-    80% {
-        opacity: 1;
+    .sidebar {
+        background-color: #3b3b3b;
+        width: 250px;
+        height: 100%;
+        z-index: 1;
+        position: fixed;
     }
 
-    to {
-        transform: translateX(0);
-        opacity: 0;
+    .sidebar-groups {
+        background-color: #252525;
+        width: 80px;
+        height: 100%;
     }
-}
 
-.section {
-    padding-top: 80px;
-}
+    .section {
+        margin-left: 250px;
+    }
 
-.navbar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: calc(100vw - 10px);
-    z-index: 100;
-    height: 50px;
-    ;
-}
+    .lds-loading-bar {
+        position: fixed;
+        animation: lds-loading-bar-2 0.1s normal forwards ease-in-out;
+        width: 100vw;
+        height: 6px;
+        background-color: #2ac811;
 
-.footer {
-    height: 100px;
-}</style>
+        &.is-loading {
+            animation: lds-loading-bar 0.2s normal forwards ease-in-out;
+        }
+    }
 
+    @keyframes lds-loading-bar {
+        from {
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        20% {
+            opacity: 1;
+        }
+
+        to {
+            transform: translateX(-25%);
+        }
+    }
+
+    @keyframes lds-loading-bar-2 {
+        from {
+            transform: translateX(-25%);
+        }
+
+
+        80% {
+            opacity: 1;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 0;
+        }
+    }
+
+
+    .section {
+        padding-top: 80px;
+    }
+</style>

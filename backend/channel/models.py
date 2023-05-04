@@ -4,14 +4,15 @@ from PIL import Image
 from django.core.files import File
 from django.db import models
 from DjangoVueTest.settings import BASE_URL
+from django.contrib.auth.models import User
 
-class Category(models.Model):
+class Channel(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
 
     class Meta:
         ordering = ('name',)
-        verbose_name_plural = "Categories"
+        verbose_name_plural = "Channels"
     
     def __str__(self):
         return self.name
@@ -20,7 +21,12 @@ class Category(models.Model):
         return f'/{self.slug}/'
     
 
+class Channel_link(models.Model):
+    channel_id = models.ForeignKey(Channel, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    
 
+"""
 class Product(models.Model):
     category = models.ForeignKey(Category, related_name='category', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -65,3 +71,4 @@ class Product(models.Model):
         thumbnail = File(thumb_io, name=image.name)
 
         return thumbnail
+"""

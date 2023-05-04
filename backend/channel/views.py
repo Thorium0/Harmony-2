@@ -3,17 +3,19 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .serializers import ProductSerializer
-from .models import Product
+from .serializers import ChannelSerializer
+from .models import Channel
 
 
-class LatestProductsList(APIView):
+class LatestChannelsList(APIView):
     def get(self, resquest, format=None):
-        products = Product.objects.all()[:4]
-        serializer = ProductSerializer(products, many=True)
+        channels = Channel.objects.all()[:4]
+        serializer = ChannelSerializer(channels, many=True)
 
         return Response(serializer.data)
 
+
+"""
 class ProductDetail(APIView):
     def get_object(self, category_slug, product_slug):
         try:
@@ -26,3 +28,4 @@ class ProductDetail(APIView):
         product = self.get_object(category_slug, product_slug)
         serializer = ProductSerializer(product)
         return Response(serializer.data)
+"""

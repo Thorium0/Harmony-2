@@ -3,34 +3,30 @@
     <section class="hero is-medium mb-6">
       <div class="hero-body has-text-centered">
         <p class="title mb-6">
-          Welcome to DjangoVueTest
+          Welcome to Harmony
         </p>
         <p class="subtitle">
-          A Django + Vue.js test
+          Harmony
         </p>
       </div>
     </section>
 
     <div class="columns is-multiline">
       <div class="column is-12">
-        <h2 class="title is-2 has-text-centered">Products</h2>
+        <h2 class="title is-2 has-text-centered">Channels</h2>
       </div>
     
 
       <div class="column is-3" 
-        v-for="product in latestProducts"
-        v-bind:key="product.id">
+        v-for="channel in latestChannels"
+        v-bind:key="channel.id">
       
 
       <div class="box">
-        <figure class="image mb-4">
-          <img :src="product.get_thumbnail">
-        </figure>
+      
+        <h3 class="is-size-4">{{ channel.name }}</h3>
 
-        <h3 class="is-size-4">{{ product.name }}</h3>
-        <p class="is-size-6 has-text-grey">{{ product.price }}kr.</p>
-
-        <router-link v-bind:to="product.get_absolute_url" class="button is-dark mt-4">View details</router-link>
+        <!--<router-link v-bind:to="product.get_absolute_url" class="button is-dark mt-4">View details</router-link>-->
       </div>
       </div>
     </div>
@@ -40,25 +36,25 @@
 <script>
 
 export default {
-  name: 'HomeView',
+  name: 'ChatView',
   data() {
     return {
-      latestProducts: []
+      latestChannels: []
     }
   },
   components: {
   },
   mounted() {
-    this.getLatestProducts()
+    this.getLatestChannels()
 
-    document.title = 'Home | Store'
+    document.title = 'Chat'
   },
   methods: {
-    getLatestProducts() {
+    getLatestChannels() {
       
-      this.axios.get('/api/v1/latest-products/')
+      this.axios.get('/api/v1/latest-channels/')
         .then(response => {
-          this.latestProducts = response.data
+          this.latestChannels = response.data
         })
         .catch(error => {
           console.log(error)

@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/Home.vue'
+import LoginView from '../views/Login.vue'
 import AboutView from '../views/About.vue'
-import ProductView from '../views/Product.vue'
+import ChatView from '../views/Chat.vue'
 import store from '../store'
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: '/login',
+    name: 'login',
+    component: LoginView
   },
   {
     path: '/about',
@@ -15,9 +15,12 @@ const routes = [
     component: AboutView
   },
   {
-    path: '/:category_slug/:product_slug',
-    name: 'product',
-    component: ProductView
+    path: '/', // '/:category_slug/:product_slug',
+    name: 'chat',
+    component: ChatView,
+    meta: {
+      requiresAuth: true
+    }
   }
 ]
 
@@ -26,7 +29,21 @@ const router = createRouter({
   routes
 })
 
-
+router.beforeEach((to, from, next) => {
+  
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    if (!store.getters.isLoggedIn) {
+      next({ name: 'login' })
+    } else {
+      next() // go to wherever I'm going
+    }
+  } else {
+    next() // does not require auth, make sure to always call next()!
+  }
+  
+})
 
 router.beforeResolve((to, from, next) => {
   if (to.name) {
@@ -34,10 +51,20 @@ router.beforeResolve((to, from, next) => {
     store.commit('setIsLoading', true)
   }
   next()
+  
 })
 
 router.afterEach(() => {
   store.commit('setIsLoading', false)
+
+  if (router.currentRoute.value.name == 'login') {
+    store.commit('setIsOnLoginPage', true)
+} else {
+    store.commit('setIsOnLoginPage', false)
+}
+  
 })
+
+
 
 export default router
