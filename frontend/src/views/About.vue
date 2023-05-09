@@ -9,7 +9,7 @@
 export default {
   name: 'AboutView',
   mounted() {
-    document.title = 'Chat'
+    document.title = 'About'
   },
 }
 </script>

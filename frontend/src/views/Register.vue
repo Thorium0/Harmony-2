@@ -80,7 +80,7 @@
                       console.log(JSON.stringify(error));
                     }
                 })
-            }
+            },
         },
         mounted() {
             document.title = 'Register | Harmony'

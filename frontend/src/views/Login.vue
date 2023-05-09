@@ -59,9 +59,9 @@ import axios from 'axios';
                         password: this.password
                     }
 
-                    this.axios.post("/api/v1/token/login", formData)
+                    this.axios.post("/api/v1/obtain-auth-token/", formData)//this.axios.post("/api/v1/token/login", formData)
                         .then(response => {
-                            const token = response.data.auth_token;
+                            const token = response.data.token;
 
                             this.$store.commit("setToken", token);
 
@@ -69,7 +69,7 @@ import axios from 'axios';
 
                             localStorage.setItem("token", token);
 
-                            const toPath = this.$route.query.to || "/about";
+                            const toPath = this.$route.query.to || "/";
 
                             this.$router.push(toPath);
                         }).catch(error => {

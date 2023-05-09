@@ -3,7 +3,7 @@ from django.db import models
 from PIL import Image
 from django.core.files import File
 from django.db import models
-from DjangoVueTest.settings import BASE_URL
+from Harmony.settings import BASE_URL
 from django.contrib.auth.models import User
 
 class Channel(models.Model):
@@ -22,8 +22,8 @@ class Channel(models.Model):
     
 
 class Channel_link(models.Model):
-    channel_id = models.ForeignKey(Channel, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    channel = models.OneToOneField(Channel, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     
 
 """
