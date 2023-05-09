@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginView from '../views/Login.vue'
+import RegisterView from '../views/Register.vue'
 import AboutView from '../views/About.vue'
 import ChatView from '../views/Chat.vue'
 import store from '../store'
@@ -8,6 +9,11 @@ const routes = [
     path: '/login',
     name: 'login',
     component: LoginView
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: RegisterView
   },
   {
     path: '/about',
@@ -34,7 +40,7 @@ router.beforeEach((to, from, next) => {
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
-    if (!store.getters.isLoggedIn) {
+    if (!store.state.isAuthenticated) {
       next({ name: 'login' })
     } else {
       next() // go to wherever I'm going
@@ -56,13 +62,6 @@ router.beforeResolve((to, from, next) => {
 
 router.afterEach(() => {
   store.commit('setIsLoading', false)
-
-  if (router.currentRoute.value.name == 'login') {
-    store.commit('setIsOnLoginPage', true)
-} else {
-    store.commit('setIsOnLoginPage', false)
-}
-  
 })
 
 
