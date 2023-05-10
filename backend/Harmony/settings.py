@@ -29,7 +29,9 @@ SECRET_KEY = 'django-insecure-*k2iw!+$byztqb0y_#vas&i_%b%yipvd98)y^!@$uzu4mdx_t9
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
+
+CORS_ALLOWED_ORIGIN_REGEXES=['http://localhost:8080', 'http://5.103.162.10:8080', 'http://thoriumserver.ddns.net:8080']
 
 
 # Application definition
@@ -120,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication'
+        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',

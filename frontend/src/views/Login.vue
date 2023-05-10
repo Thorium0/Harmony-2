@@ -68,6 +68,7 @@ import axios from 'axios';
                             axios.defaults.headers.common["Authorization"] = `Token ${token}`;
 
                             localStorage.setItem("token", token);
+                            localStorage.setItem("username", this.username);
 
                             const toPath = this.$route.query.to || "/";
 
