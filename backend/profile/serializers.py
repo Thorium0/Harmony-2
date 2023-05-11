@@ -15,6 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username',
+                  'email',
                   'password',
                   )
 
@@ -37,7 +38,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfileSerializer(serializers.ModelSerializer):
     image = serializers.ImageField(required=False)
-    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    user = UserSerializer(required=False)
 
     class Meta:
         model = Profile
@@ -45,6 +46,20 @@ class ProfileSerializer(serializers.ModelSerializer):
                   'user'
                   )
     
-    
+    def update(self, instance, validated_data):
+        user = validated_data.get('user')
+        if user:
+            instance.user.username = user["username"]
+            instance.user.save()
+        
+        image = validated_data.get('image')
+        if image:
+            instance.user.profile.image = image
+            instance.user.profile.save()
 
+
+
+
+    
+    
     

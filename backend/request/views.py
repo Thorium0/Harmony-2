@@ -3,7 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.decorators import login_required
 from rest_framework import authentication, permissions
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+
+from channel.views import CreateOrUpdateGroup
 
 from .models import FriendRequest
 from .serializers import FriendRequestSerializer
@@ -85,6 +87,8 @@ class FriendApprover(APIView):
             if friendRequest.status == "P":
                 if request.data["status"] == "A":
                     friendRequest.status = "A"
+                    
+                    CreateOrUpdateGroup(friendRequest.fromUser, friendRequest.toUser)
                 elif request.data["status"] == "R":
                     friendRequest.status = "R"
                 else: 

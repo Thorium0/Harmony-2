@@ -56,7 +56,7 @@
         },
         methods: {
             submitForm() {
-                this.errors = [];
+                
 
                 const formData = {
                     username: this.username,
@@ -65,8 +65,10 @@
 
                 this.axios.post("/api/v1/users/", formData)
                 .then(response => {
+                    this.errors = [];
                     this.$router.push("/login");
                 }).catch(error => {
+                    this.errors = [];
                     if (error.response) {
                         for (const property in error.response.data) {
                             this.errors.push(`${property}: ${error.response.data[property]}`);

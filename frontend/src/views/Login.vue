@@ -52,7 +52,7 @@ import axios from 'axios';
                     this.axios.defaults.headers.common["Authorization"] = ""
                     localStorage.removeItem("token");
 
-                    this.errors = [];
+                    
 
                     const formData = {
                         username: this.username,
@@ -61,6 +61,7 @@ import axios from 'axios';
 
                     this.axios.post("/api/v1/obtain-auth-token/", formData)//this.axios.post("/api/v1/token/login", formData)
                         .then(response => {
+                            this.errors = [];
                             const token = response.data.token;
 
                             this.$store.commit("setToken", token);
@@ -74,6 +75,7 @@ import axios from 'axios';
 
                             this.$router.push(toPath);
                         }).catch(error => {
+                            this.errors = [];
                             if (error.response) {
                                 for (const property in error.response.data) {
                                     this.errors.push(`${property}: ${error.response.data[property]}`);
