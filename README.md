@@ -1,6 +1,6 @@
 # Harmony-2
 
-Font: Roboto
+Font: Roboto <br/>
 icon pack: Materialdesign
 
 Libraries used:
