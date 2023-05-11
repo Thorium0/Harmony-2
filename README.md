@@ -10,11 +10,13 @@ Libraries used:
 - djoser
 
 Requirements:
-Install Python >= 3.10.0
-pip install -r requirements.txt
+- Installs
+ - Install Python >= 3.10.0
+ - Install npm >= 8.1.2
 
-install npm >= 8.1.2
-npm install -g @vue/cli
-npm install axios yarn
-cd frontend
-npm install
+- Library install commands
+ - pip install -r requirements.txt
+ - npm install -g @vue/cli
+ - npm install axios yarn
+ - cd frontend
+ - npm install
