@@ -1,5 +1,8 @@
 # Harmony-2
 
+Font: Roboto
+icon pack: Materialdesign
+
 Libraries used:
 - Vue
 - Vuetify
