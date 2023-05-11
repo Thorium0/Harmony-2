@@ -1,5 +1,13 @@
 # Harmony-2
 
+Libraries used:
+- Vue
+- Vuetify
+- Axios
+- Django
+- Django rest_framework
+- corsheaders
+- djoser
 
 Requirements:
 Install Python >= 3.10.0
