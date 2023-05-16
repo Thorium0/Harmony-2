@@ -6,6 +6,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 import '@mdi/font/css/materialdesignicons.css'
 
+
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'

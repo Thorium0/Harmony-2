@@ -27,7 +27,8 @@ class FriendChannels(APIView):
             friend = User.objects.filter(groups__name=group.name).exclude(id=request.user.id).first()
             data_group["friend"] = {
                 "id": friend.id,
-                "username": friend.username
+                "username": friend.username,
+                "image": friend.profile.image.url
             }
 
            

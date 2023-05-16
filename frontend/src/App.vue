@@ -11,7 +11,9 @@
 
                             <v-card class="pa-2">
                                 <template v-slot:title>
+                                    <v-card-text>
                                     Account Settings
+                                </v-card-text>
                                 </template>
                                 <v-form @submit.prevent="updateProfile">
 
@@ -129,17 +131,20 @@
                         </v-row>
                     </v-card>
 
-
-                    <v-card class="mb-2 pr-2">
+                    
+                    <v-btn height="80px" width="150px" class="mb-2" v-if="friend_channels.length" v-for="channel in friend_channels">
+                    <v-card height="80px" width="150px">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink">
-                                <v-img src="//placehold.it/80x80" max-width="80" class="ml-3 rounded-circle"></v-img>
+                                <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image" max-width="80" class="ml-3 rounded-circle"></v-img>
                             </v-col>
                             <v-col>
-                                <v-card-text class="pa-0">kagemand</v-card-text>
+                                <v-card-text class="pa-0 font-weight-regular">{{ channel.friend.username }}</v-card-text>
                             </v-col>
                         </v-row>
                     </v-card>
+                </v-btn>
+                
 
 
                 </td>
@@ -176,6 +181,8 @@
                 username: localStorage.username,
                 update_username: "",
                 update_profile_picture: null,
+                imageBaseUrl: "http://localhost:8000",
+                friend_channels: {},
             }
         },
         beforeCreate() {
@@ -202,6 +209,7 @@
                     return
                 }
                 this.updateFriendRequests()
+                this.getFriendChannels()
             }, 2000);
 
         },
@@ -279,6 +287,7 @@
 
                 this.axios.post("/api/v1/request/set/", formData).then(response => {
                     this.updateFriendRequests()
+                    this.getFriendChannels()
                 })
             },
             rejectFriendRequest(requestId) {
@@ -333,7 +342,12 @@
                         console.log(JSON.stringify(error));
                     }
                 })
-            }
+            },
+            getFriendChannels() {
+                this.axios.get("/api/v1/channel/").then(response => {
+                    this.friend_channels = response.data
+                })
+            },
         }
     }
 </script>
@@ -362,6 +376,7 @@
         z-index: 1;
         position: fixed;
     }
+
 
     .sidebar-groups {
         background-color: #252525;
