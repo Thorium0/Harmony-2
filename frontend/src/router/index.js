@@ -16,12 +16,15 @@ const routes = [
     component: RegisterView
   },
   {
-    path: '/about',
+    path: '/',
     name: 'about',
-    component: AboutView
+    component: AboutView,
+    meta: {
+      requiresAuth: true
+    }
   },
   {
-    path: '/', // '/:category_slug/:product_slug',
+    path: '/chat/:chat_id',
     name: 'chat',
     component: ChatView,
     meta: {

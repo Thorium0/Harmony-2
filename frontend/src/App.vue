@@ -132,7 +132,7 @@
                     </v-card>
 
                     
-                    <v-btn height="80px" width="150px" class="mb-2" v-if="friend_channels.length" v-for="channel in friend_channels">
+                    <v-btn height="80px" width="150px" class="mb-2" v-if="friend_channels.length" v-for="channel in friend_channels" :to="'/chat/'+ channel.id">
                     <v-card height="80px" width="150px">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink">

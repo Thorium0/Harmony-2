@@ -1,36 +1,30 @@
 <template>
-  <div class="home">
-    <section class="hero is-medium mb-6">
-      <div class="hero-body has-text-centered">
-        <p class="title mb-6">
-          Welcome to Harmony
-        </p>
-        <p class="subtitle">
-          Harmony
-        </p>
-      </div>
-    </section>
+ 
+    <v-container fluid pa-0 class="chat-container">
+      <v-row align="center" justify="left">
+                <v-col cols="1" lg="1" md="6" class="grey lighten-2 fill-height d-flex flex-column justify-center align-center">
+                    <v-card flat tile>
+                        <v-card-text>Message</v-card-text>
+                    </v-card>
+                </v-col>
+            </v-row>
+    </v-container>
+    <v-card height="150px">
+      <v-form @submit.prevent="">
+        <div class="d-flex ustify-space-around">
+       
+              <v-text-field rounded label="Type message here" style="width: calc(100% - 138px)">
 
-    <div class="columns is-multiline">
-      <div class="column is-12">
-        <h2 class="title is-2 has-text-centered">Channels</h2>
-      </div>
-    
-
-      <div class="column is-3" 
-        v-for="channel in latestChannels"
-        v-bind:key="channel.id">
-      
-
-      <div class="box">
-      
-        <h3 class="is-size-4">{{ channel.name }}</h3>
-
-        <!--<router-link v-bind:to="product.get_absolute_url" class="button is-dark mt-4">View details</router-link>-->
-      </div>
-      </div>
-    </div>
-  </div>
+              </v-text-field>
+        
+           
+              <v-btn icon="mdi-send" type="submit">
+                </v-btn>
+     </div>>
+        
+      </v-form>
+    </v-card>
+ 
 </template>
 
 <script>
@@ -39,36 +33,24 @@ export default {
   name: 'ChatView',
   data() {
     return {
-      latestChannels: []
+      
     }
   },
   components: {
   },
   mounted() {
-    this.getLatestChannels()
-
     document.title = 'Chat'
+
+    console.log(this.$route.params.chat_id)
   },
   methods: {
-    getLatestChannels() {
-      
-      this.axios.get('/api/v1/latest-channels/')
-        .then(response => {
-          this.latestChannels = response.data
-        })
-        .catch(error => {
-          console.log(error)
-        })
-        
-    }
+    
   }
 }
 </script>
 
 <style scoped>
-.image {
-  margin-top: -1.25rem;
-  margin-left: -1.25rem;
-  margin-right: -1.25rem;
+.chat-container {
+  height: calc(100vh - 138px);
 }
 </style>
