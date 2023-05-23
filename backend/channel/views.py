@@ -5,12 +5,10 @@ from rest_framework.response import Response
 from rest_framework import authentication, permissions
 from django.contrib.auth.models import User, Group
 
-"""
- data_group["members"] = []
-            users = User.objects.filter(groups__name=group.name)
-            for user in users:
-                data_group["members"].append(user.username)
-"""
+from request.models import FriendRequest
+
+from .models import Message
+from .serializers import MessageSerializer
 
 class FriendChannels(APIView):
     authentication_classes = (authentication.TokenAuthentication,)
@@ -38,21 +36,60 @@ class FriendChannels(APIView):
 
         return Response(data, status=201)
 
-def CreateOrUpdateGroup(user1, user2):
-
+def CreateOrUpdateGroup(instance):
+        user1 = instance.fromUser_id
+        user2 = instance.toUser_id
 
         if user1 == user2:
             return Response({"error": "You cannot create a channel with yourself"}, status=400)
 
-        group = Group.objects.filter(name=str(user2.id) +"_"+ str(user1.id))
+        group = Group.objects.filter(name=str(user2) +"_"+ str(user1))
         if group.exists():
             group = group.first()
         else:
-            group = Group.objects.get_or_create(name=str(user1.id) +"_"+ str(user2.id))[0]
+            group = Group.objects.get_or_create(name=str(user1) +"_"+ str(user2))[0]
 
-      
-        user1.groups.add(group)
-        user2.groups.add(group)
+        user1_instance = User.objects.get(id=user1)
+        user1_instance.groups.add(group)
 
-        return Response("Channel created", status=201)
+        user2_instance = User.objects.get(id=user2)
+        user2_instance.groups.add(group)
+        
 
+        return group
+
+
+def delGroup(instance):
+    group = Group.objects.filter(id=instance.group_id)
+    group.delete()
+
+
+
+
+class Messages(APIView):
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+
+    def get(self, request, channel_name, format=None):
+        group = Group.objects.filter(name=channel_name)
+        if group.exists():
+            group = group.first()
+            if not request.user in group.user_set.all():
+                return Response({"error": "You are not in this channel"}, status=400)
+            messages = Message.objects.filter(group=group)
+
+            data = []
+            for message in messages:
+                dict = {}
+                dict["id"] = message.id
+                dict["content"] = message.content
+                dict["sender"] = {
+                    "id": message.sender.id,
+                    "username": message.sender.username,
+                    "image": message.sender.profile.image.url
+                }
+                data.append(dict)
+            return Response(data, status=201)
+        else:
+            return Response({"error": "Channel does not exist"}, status=400)
