@@ -71,8 +71,8 @@ class Messages(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
 
-    def get(self, request, channel_name, format=None):
-        group = Group.objects.filter(name=channel_name)
+    def get(self, request, channel_id, format=None):
+        group = Group.objects.filter(id=channel_id)
         if group.exists():
             group = group.first()
             if not request.user in group.user_set.all():
