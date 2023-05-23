@@ -1,8 +1,7 @@
 <template>
     <div id="wrapper">
-        <table v-if="showSidebar" class="sidebar">
-            <tr>
-                <td colspan="2">
+        <div v-if="showSidebar" class="sidebar">
+                <div class="myaccount-container">
                     <v-card>
                         <v-dialog v-model="accountDialog" width="auto">
                             <template v-slot:activator="{ props }">
@@ -42,12 +41,12 @@
                         {{ username }}
                         <!--<span class="text-muted">#1234</span>-->
                     </v-card>
-                </td>
-            </tr>
-            <tr>
-                <td class="sidebar-groups">
+                </div>
+           
+                <div class="d-flex ustify-space-around channel-flex-box">
+                <div class="sidebar-groups">
 
-                    <!--FOREACH BULLSHIT-->
+              
 
 
 
@@ -106,37 +105,39 @@
 
 
 
-                    <!--END FOREACH BULLSHIT-->
+                   
 
 
-                </td>
+                </div>
 
-                <td class="sidebar-friends">
+                <div class="sidebar-friends pa-4">
 
 
 
-                    <v-card v-if="friend_requests.length" v-for="friend_request in friend_requests"
+                    <v-card width="145px" v-if="friend_requests.length" v-for="friend_request in friend_requests"
                         v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'">
                         <v-row align="center" class="mt-1 mb-1">
-                            <v-col class="shrink">
-                                <v-img src="//placehold.it/80x80" max-width="80" class="ml-3 rounded-circle"></v-img>
+                            <v-col class="shrink pr-0">
+                                <v-img src="//placehold.it/50x50" height="50px" width="50px" class="ml-3 rounded-circle"></v-img>
                             </v-col>
                             <v-col>
                                 <v-card-text class="pa-0">Request: {{ friend_request.username }}</v-card-text>
+                                <div class="d-flex ustify-space-around">
                                 <v-btn class="mr-1" density="compact" icon="mdi-check" color="green"
                                     @click="acceptFriendRequest(friend_request.id)"></v-btn>
                                 <v-btn density="compact" icon="mdi-close" color="red"
                                     @click="rejectFriendRequest(friend_request.id)"></v-btn>
+                                </div>
                             </v-col>
                         </v-row>
                     </v-card>
 
                     
-                    <v-btn height="80px" width="150px" class="mb-2" v-if="friend_channels.length" v-for="channel in friend_channels" :to="'/chat/'+ channel.id">
-                    <v-card height="80px" width="150px">
+                    <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length" v-for="channel in friend_channels" :to="'/chat/'+ channel.id">
+                    <v-card height="80px" width="145px">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink">
-                                <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image" max-width="80" class="ml-3 rounded-circle"></v-img>
+                                <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image" class="ml-3 rounded-circle"></v-img>
                             </v-col>
                             <v-col>
                                 <v-card-text class="pa-0 font-weight-regular">{{ channel.friend.username }}</v-card-text>
@@ -147,10 +148,10 @@
                 
 
 
-                </td>
-            </tr>
-
-        </table>
+            </div>
+            
+                </div>
+        </div>
 
 
 
@@ -182,7 +183,7 @@
                 update_username: "",
                 update_profile_picture: null,
                 imageBaseUrl: "http://localhost:8000",
-                friend_channels: {},
+                friend_channels: [],
             }
         },
         beforeCreate() {
@@ -196,7 +197,7 @@
                 this.axios.defaults.headers.common['Authorization'] = null
             }
 
-
+            
 
 
         },
@@ -210,7 +211,10 @@
                 }
                 this.updateFriendRequests()
                 this.getFriendChannels()
+               
             }, 2000);
+
+            
 
         },
         beforeUpdate() {
@@ -359,8 +363,9 @@
     body {
         margin: 0;
         height: 100%;
+        overflow: hidden;
     }
-
+    
     .text-muted {
         color: #6c757d;
     }
@@ -371,21 +376,37 @@
 
     .sidebar {
         background-color: #3b3b3b;
-        width: 250px;
+        width: 300px;
         height: 100%;
-        z-index: 1;
-        position: fixed;
+        position: absolute;
+        overflow: hidden;
     }
 
 
     .sidebar-groups {
         background-color: #252525;
-        width: 80px;
+        width: 110px;
         height: 100%;
+        overflow-y: scroll;
+    }
+
+    
+    .sidebar-friends {
+        width: 200px;
+        height: 100%;
+        overflow-y: scroll;
     }
 
     .section {
-        margin-left: 250px;
+        margin-left: 300px;
+    }
+
+    .myaccount-container {
+        width: 100%;
+    }
+
+    .channel-flex-box {
+        height: 100%;
     }
 
     .lds-loading-bar {
@@ -429,10 +450,5 @@
             transform: translateX(0);
             opacity: 0;
         }
-    }
-
-
-    .section {
-        padding-top: 80px;
     }
 </style>

@@ -88,7 +88,7 @@ class FriendApprover(APIView):
                 if request.data["status"] == "A":
                     friendRequest.status = "A"
                     
-                    CreateOrUpdateGroup(friendRequest.fromUser, friendRequest.toUser)
+                    #CreateOrUpdateGroup(friendRequest.fromUser, friendRequest.toUser)
                 elif request.data["status"] == "R":
                     friendRequest.status = "R"
                 else: 

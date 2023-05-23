@@ -9,7 +9,7 @@
                 </v-col>
             </v-row>
     </v-container>
-    <v-card height="150px">
+    <v-card class="message-container">
       <v-form @submit.prevent="">
         <div class="d-flex ustify-space-around">
        
@@ -20,7 +20,7 @@
            
               <v-btn icon="mdi-send" type="submit">
                 </v-btn>
-     </div>>
+     </div>
         
       </v-form>
     </v-card>
@@ -33,7 +33,7 @@ export default {
   name: 'ChatView',
   data() {
     return {
-      
+  
     }
   },
   components: {
@@ -50,7 +50,16 @@ export default {
 </script>
 
 <style scoped>
+
 .chat-container {
-  height: calc(100vh - 138px);
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  position: relative;
+}
+.message-container {
+  height: 60px;
+  position: fixed;
+  width: calc(100% - 250px);
+  bottom: 0;
 }
 </style>
