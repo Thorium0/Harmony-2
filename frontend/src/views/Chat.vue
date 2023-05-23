@@ -13,7 +13,7 @@
       <v-form @submit.prevent="">
         <div class="d-flex ustify-space-around">
        
-              <v-text-field rounded label="Type message here" style="width: calc(100% - 138px)">
+              <v-text-field rounded label="Type message here">
 
               </v-text-field>
         
@@ -59,7 +59,7 @@ export default {
 .message-container {
   height: 60px;
   position: fixed;
-  width: calc(100% - 250px);
+  width: calc(100% - 300px);
   bottom: 0;
 }
 </style>
