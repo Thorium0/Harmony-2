@@ -71,7 +71,7 @@
                     <v-dialog v-model="addDialog" width="auto">
                         <template v-slot:activator="{ props }">
 
-                            <v-btn text="+" height="80px" width="80px" class="ma-1 large-text rounded-circle"
+                            <v-btn color="grey-darken-1" text="+" height="80px" width="80px" class="ma-1 large-text rounded-circle"
                                 v-bind="props"></v-btn>
                             <v-btn text="<" height="80px" width="80px" class="ma-1 large-text rounded-circle"
                                 v-if="isMobile()" @click="showSidebar = !showSidebar"></v-btn>
@@ -115,7 +115,7 @@
 
 
                     <v-card width="145px" v-if="friend_requests.length" v-for="friend_request in friend_requests"
-                        v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'">
+                        v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'" color="grey-darken-1">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink pr-0">
                                 <v-img v-bind:src="imageBaseUrl + friend_request.image" height="50px" width="50px"
@@ -136,7 +136,7 @@
 
                     <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length"
                         v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id)">
-                        <v-card height="80px" width="145px">
+                        <v-card height="80px" width="145px" color="grey-darken-1">
                             <v-row align="center" class="mt-1 mb-1">
                                 <v-col class="shrink">
                                     <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image"
@@ -375,10 +375,7 @@
         margin: 0;
         height: 100%;
         overflow: hidden;
-    }
-
-    .text-muted {
-        color: #757575;
+        background-color: #616161;
     }
 
     .large-text {
@@ -393,9 +390,8 @@
         overflow: hidden;
     }
 
-
     .sidebar-groups {
-        background-color: #616161;
+        background-color: #212121;
         width: 110px;
         height: 100%;
         overflow-y: scroll;
