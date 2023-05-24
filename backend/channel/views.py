@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
 from django.contrib.auth.models import User, Group
+from datetime import datetime
 
 from request.models import FriendRequest
 
@@ -84,6 +85,11 @@ class Messages(APIView):
                 dict = {}
                 dict["id"] = message.id
                 dict["content"] = message.content
+                time = message.timestamp
+                if time.date() < datetime.today().date():
+                     dict["timestamp"] = time.strftime("Today at %H:%M:%S")
+                else:
+                     dict["timestamp"] = time.strftime("%d/%m/%Y %H:%M")
                 dict["sender"] = {
                     "id": message.sender.id,
                     "username": message.sender.username,
