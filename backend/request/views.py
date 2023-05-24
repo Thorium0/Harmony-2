@@ -24,6 +24,7 @@ class FriendRequests(APIView):
         for friend_request in requests:
             dict = {}
             dict["id"] = friend_request.id
+            dict["image"] = friend_request.fromUser.profile.image.url
             dict["username"] = friend_request.fromUser.username
             data.append(dict)
 
