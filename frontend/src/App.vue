@@ -1,52 +1,52 @@
 <template>
     <div id="wrapper">
         <div v-if="showSidebar" class="sidebar">
-                <div class="myaccount-container">
-                    <v-card>
-                        <v-dialog v-model="accountDialog" width="auto">
-                            <template v-slot:activator="{ props }">
-                                <v-btn density="compact" icon="mdi-cog" color="grey" v-bind="props"></v-btn>
-                            </template>
+            <div class="myaccount-container">
+                <v-card>
+                    <v-dialog v-model="accountDialog" width="auto">
+                        <template v-slot:activator="{ props }">
+                            <v-btn density="compact" icon="mdi-cog" color="grey" v-bind="props"></v-btn>
+                        </template>
 
-                            <v-card class="pa-2">
-                                <template v-slot:title>
-                                    <v-card-text>
+                        <v-card class="pa-2">
+                            <template v-slot:title>
+                                <v-card-text>
                                     Account Settings
                                 </v-card-text>
-                                </template>
-                                <v-form @submit.prevent="updateProfile">
+                            </template>
+                            <v-form @submit.prevent="updateProfile">
 
-                                    <v-text-field v-model="update_username" :counter="10" label="Change username">
-                                    </v-text-field>
-
-
-                                    <v-file-input accept="image/*" v-model="update_profile_picture"
-                                        label="Upload profile picture"></v-file-input>
+                                <v-text-field v-model="update_username" :counter="10" label="Change username">
+                                </v-text-field>
 
 
-                                    <v-card-actions>
-                                        <v-btn color="green" type="submit">Update</v-btn>
-                                        <v-btn color="primary" @click="accountDialog = false">Close</v-btn>
-                                        <v-btn color="secondary" @click="logout">Logout</v-btn>
-                                    </v-card-actions>
-                                </v-form>
-                            </v-card>
-                            <v-card width="400" v-if="errors.length" class="pa-2 mt-2" color="#555500">
+                                <v-file-input accept="image/*" v-model="update_profile_picture"
+                                    label="Upload profile picture"></v-file-input>
+
+
+                                <v-card-actions>
+                                    <v-btn color="green" type="submit">Update</v-btn>
+                                    <v-btn color="primary" @click="accountDialog = false">Close</v-btn>
+                                    <v-btn color="secondary" @click="logout">Logout</v-btn>
+                                </v-card-actions>
+                            </v-form>
+                        </v-card>
+                        <v-card width="400" v-if="errors.length" class="pa-2 mt-2" color="#555500">
                             <ul>
                                 <li v-for="error in errors" :key="error">&#x2022; {{ error }}</li>
                             </ul>
                         </v-card>
-                        </v-dialog>
+                    </v-dialog>
 
-                        {{ username }}
-                        <!--<span class="text-muted">#1234</span>-->
-                    </v-card>
-                </div>
-           
-                <div class="d-flex ustify-space-around channel-flex-box">
+                    {{ username }}
+                    <!--<span class="text-muted">#1234</span>-->
+                </v-card>
+            </div>
+
+            <div class="d-flex ustify-space-around channel-flex-box">
                 <div class="sidebar-groups">
 
-              
+
 
 
 
@@ -105,7 +105,7 @@
 
 
 
-                   
+
 
 
                 </div>
@@ -118,39 +118,43 @@
                         v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink pr-0">
-                                <v-img src="//placehold.it/50x50" height="50px" width="50px" class="ml-3 rounded-circle"></v-img>
+                                <v-img v-bind:src="imageBaseUrl + friend_request.friend.image" height="50px" width="50px"
+                                    class="ml-3 rounded-circle"></v-img>
                             </v-col>
                             <v-col>
                                 <v-card-text class="pa-0">Request: {{ friend_request.username }}</v-card-text>
                                 <div class="d-flex ustify-space-around">
-                                <v-btn class="mr-1" density="compact" icon="mdi-check" color="green"
-                                    @click="acceptFriendRequest(friend_request.id)"></v-btn>
-                                <v-btn density="compact" icon="mdi-close" color="red"
-                                    @click="rejectFriendRequest(friend_request.id)"></v-btn>
+                                    <v-btn class="mr-1" density="compact" icon="mdi-check" color="green"
+                                        @click="acceptFriendRequest(friend_request.id)"></v-btn>
+                                    <v-btn density="compact" icon="mdi-close" color="red"
+                                        @click="rejectFriendRequest(friend_request.id)"></v-btn>
                                 </div>
                             </v-col>
                         </v-row>
                     </v-card>
 
-                    
-                    <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length" v-for="channel in friend_channels" :to="'/chat/'+ channel.id">
-                    <v-card height="80px" width="145px">
-                        <v-row align="center" class="mt-1 mb-1">
-                            <v-col class="shrink">
-                                <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image" class="ml-3 rounded-circle"></v-img>
-                            </v-col>
-                            <v-col>
-                                <v-card-text class="pa-0 font-weight-regular">{{ channel.friend.username }}</v-card-text>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                </v-btn>
-                
 
+                    <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length"
+                        v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id)">
+                        <v-card height="80px" width="145px">
+                            <v-row align="center" class="mt-1 mb-1">
+                                <v-col class="shrink">
+                                    <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image"
+                                        class="ml-3 rounded-circle"></v-img>
+                                </v-col>
+                                <v-col>
+                                    <v-card-text class="pa-0 font-weight-regular">{{ channel.friend.username }}
+                                    </v-card-text>
+                                </v-col>
+                            </v-row>
+                        </v-card>
+                    </v-btn>
+
+
+
+                </div>
 
             </div>
-            
-                </div>
         </div>
 
 
@@ -168,8 +172,8 @@
 </template>
 
 <script>
-    export default {
 
+    export default {
 
         data() {
             return {
@@ -184,6 +188,7 @@
                 update_profile_picture: null,
                 imageBaseUrl: "http://localhost:8000",
                 friend_channels: [],
+                selectedChannelId: null,
             }
         },
         beforeCreate() {
@@ -197,7 +202,7 @@
                 this.axios.defaults.headers.common['Authorization'] = null
             }
 
-            
+
 
 
         },
@@ -211,10 +216,10 @@
                 }
                 this.updateFriendRequests()
                 this.getFriendChannels()
-               
+
             }, 2000);
 
-            
+
 
         },
         beforeUpdate() {
@@ -305,7 +310,7 @@
                 })
             },
             updateProfile() {
-                
+
                 var formData = new FormData()
 
                 if (this.update_username.length > 1) {
@@ -315,13 +320,15 @@
                     formData.append("image", this.update_profile_picture[0])
                 }
 
-   
-                
+
+
                 const headers = {
                     'Content-Type': 'multipart/form-data'
                 }
 
-                this.axios.put("/api/v1/profile/", formData, {headers: headers}).then(response => {
+                this.axios.put("/api/v1/profile/", formData, {
+                    headers: headers
+                }).then(response => {
                     this.errors = []
 
                     if (response.data.user) {
@@ -352,6 +359,10 @@
                     this.friend_channels = response.data
                 })
             },
+            setChannelId(channel_id) {
+                this.$store.commit("setSelectedChannelId", channel_id)
+            },
+           
         }
     }
 </script>
@@ -365,9 +376,9 @@
         height: 100%;
         overflow: hidden;
     }
-    
+
     .text-muted {
-        color: #6c757d;
+        color: #757575;
     }
 
     .large-text {
@@ -375,7 +386,7 @@
     }
 
     .sidebar {
-        background-color: #3b3b3b;
+        background-color: #424242;
         width: 300px;
         height: 100%;
         position: absolute;
@@ -384,13 +395,13 @@
 
 
     .sidebar-groups {
-        background-color: #252525;
+        background-color: #616161;
         width: 110px;
         height: 100%;
         overflow-y: scroll;
     }
 
-    
+
     .sidebar-friends {
         width: 200px;
         height: 100%;

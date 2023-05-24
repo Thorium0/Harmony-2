@@ -5,6 +5,7 @@ export default createStore({
         isAuthenticated: false,
         token: '',
         isLoading: false,
+        selectedChannelId: null,
     },
     mutations: {
         initializeStore(state) {
@@ -26,6 +27,12 @@ export default createStore({
         removeToken(state) {
             state.token = ''
             state.isAuthenticated = false
+        },
+        setSelectedChannelId(state, id) {
+            state.selectedChannelId = id
+        },
+        removeSelectedChannelId(state) {
+            state.selectedChannelId = null
         }
     },
     actions: {
