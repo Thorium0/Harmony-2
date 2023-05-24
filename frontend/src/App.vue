@@ -118,7 +118,7 @@
                         v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink pr-0">
-                                <v-img v-bind:src="imageBaseUrl + friend_request.friend.image" height="50px" width="50px"
+                                <v-img v-bind:src="imageBaseUrl + friend_request.image" height="50px" width="50px"
                                     class="ml-3 rounded-circle"></v-img>
                             </v-col>
                             <v-col>

@@ -1,14 +1,16 @@
 <template>
 
   <v-container fluid pa-0 class="chat-container">
-    <v-row align="center" justify="left">
-      <v-col cols="1" lg="1" md="6" class="grey lighten-2 fill-height d-flex flex-column justify-center align-center">
-        <v-card flat tile v-if="messages.length" v-for="message in messages">
-          <v-img v-bind:src="imageBaseUrl + message.sender.image" height="50px" width="50px" class="ml-3 rounded-circle"></v-img>
-          <v-card-title>{{ message.sender.username }}</v-card-title>
+    <v-row align="center" v-if="messages.length" v-for="message in messages" class="message-row">
+      <v-card-title>{{ message.sender.username }}</v-card-title>
+        <div class="d-flex ustify-space-around message-div">
+         
+        <v-img v-bind:src="imageBaseUrl + message.sender.image" height="50px" width="50px" class="rounded-circle"></v-img>
+        <v-card flat tile class="message-card">
           <v-card-text>{{ message.content }}</v-card-text>
         </v-card>
-      </v-col>
+      </div>
+    
     </v-row>
   </v-container>
   <v-card class="message-container">
@@ -81,5 +83,20 @@
     position: fixed;
     width: calc(100% - 250px);
     bottom: 0;
+  }
+
+  .message-row {
+    height: 80px;
+    width: 90%;
+    margin: 4px;
+  }
+
+  .message-div {
+    width: 100%;
+  }
+
+  .message-card {
+    width: 100%;
+    margin-left: 4px;
   }
 </style>
