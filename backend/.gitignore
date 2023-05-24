@@ -76,3 +76,7 @@ media/
 
 # Venv
 venv
+
+# Database files
+*.sqlite3
+*.db

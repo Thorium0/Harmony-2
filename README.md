@@ -20,6 +20,5 @@ Requirements:
 - Library install commands
   - pip install -r requirements.txt
   - npm install -g @vue/cli
-  - npm install axios yarn
-  - cd frontend
-  - npm install
+  - npm install axios yarn vuetify@3.3.0
+  - cd frontend && npm install
