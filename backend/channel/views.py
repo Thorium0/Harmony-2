@@ -78,7 +78,7 @@ class Messages(APIView):
             group = group.first()
             if not request.user in group.user_set.all():
                 return Response({"error": "You are not in this channel"}, status=400)
-            messages = Message.objects.filter(group=group)
+            messages = Message.objects.filter(group=group).order_by('-timestamp')
 
             data = []
             for message in messages:
@@ -86,7 +86,7 @@ class Messages(APIView):
                 dict["id"] = message.id
                 dict["content"] = message.content
                 time = message.timestamp
-                if time.date() < datetime.today().date():
+                if time.date() == datetime.today().date():
                      dict["timestamp"] = time.strftime("Today at %H:%M:%S")
                 else:
                      dict["timestamp"] = time.strftime("%d/%m/%Y %H:%M")
