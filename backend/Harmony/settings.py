@@ -27,7 +27,7 @@ BASE_URL = str(environ.get("DOMAIN"))
 SECRET_KEY = str(environ.get("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = str(environ.get("DEBUG"))
 
 ALLOWED_HOSTS = [str(environ.get("ALLOWED_HOSTS"))]
 
@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    str(environ.get("VUE_APP_DOMAIN"))
+    'http://localhost:8080'
 ]
 
 MIDDLEWARE = [
