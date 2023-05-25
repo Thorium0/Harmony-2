@@ -1,52 +1,52 @@
 <template>
     <div id="wrapper">
         <div v-if="showSidebar" class="sidebar">
-                <div class="myaccount-container">
-                    <v-card>
-                        <v-dialog v-model="accountDialog" width="auto">
-                            <template v-slot:activator="{ props }">
-                                <v-btn density="compact" icon="mdi-cog" color="grey" v-bind="props"></v-btn>
-                            </template>
+            <div class="myaccount-container">
+                <v-card>
+                    <v-dialog v-model="accountDialog" width="auto">
+                        <template v-slot:activator="{ props }">
+                            <v-btn density="compact" icon="mdi-cog" color="grey" v-bind="props"></v-btn>
+                        </template>
 
-                            <v-card class="pa-2">
-                                <template v-slot:title>
-                                    <v-card-text>
+                        <v-card class="pa-2">
+                            <template v-slot:title>
+                                <v-card-title>
                                     Account Settings
-                                </v-card-text>
-                                </template>
-                                <v-form @submit.prevent="updateProfile">
+                                </v-card-title>
+                            </template>
+                            <v-form @submit.prevent="updateProfile">
 
-                                    <v-text-field v-model="update_username" :counter="10" label="Change username">
-                                    </v-text-field>
-
-
-                                    <v-file-input accept="image/*" v-model="update_profile_picture"
-                                        label="Upload profile picture"></v-file-input>
+                                <v-text-field v-model="update_username" :counter="10" label="Change username">
+                                </v-text-field>
 
 
-                                    <v-card-actions>
-                                        <v-btn color="green" type="submit">Update</v-btn>
-                                        <v-btn color="primary" @click="accountDialog = false">Close</v-btn>
-                                        <v-btn color="secondary" @click="logout">Logout</v-btn>
-                                    </v-card-actions>
-                                </v-form>
-                            </v-card>
-                            <v-card width="400" v-if="errors.length" class="pa-2 mt-2" color="#555500">
+                                <v-file-input accept="image/*" v-model="update_profile_picture"
+                                    label="Upload profile picture"></v-file-input>
+
+
+                                <v-card-actions>
+                                    <v-btn color="green" type="submit">Update</v-btn>
+                                    <v-btn color="primary" @click="accountDialog = false">Close</v-btn>
+                                    <v-btn color="secondary" @click="logout">Logout</v-btn>
+                                </v-card-actions>
+                            </v-form>
+                        </v-card>
+                        <v-card width="400" v-if="errors.length" class="pa-2 mt-2" color="#555500">
                             <ul>
                                 <li v-for="error in errors" :key="error">&#x2022; {{ error }}</li>
                             </ul>
                         </v-card>
-                        </v-dialog>
+                    </v-dialog>
 
-                        {{ username }}
-                        <!--<span class="text-muted">#1234</span>-->
-                    </v-card>
-                </div>
-           
-                <div class="d-flex ustify-space-around channel-flex-box">
+                    {{ username }}
+                    <!--<span class="text-muted">#1234</span>-->
+                </v-card>
+            </div>
+
+            <div class="d-flex ustify-space-around channel-flex-box">
                 <div class="sidebar-groups">
 
-              
+
 
 
 
@@ -105,7 +105,7 @@
 
 
 
-                   
+
 
 
                 </div>
@@ -118,45 +118,54 @@
                         v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink pr-0">
-                                <v-img src="//placehold.it/50x50" height="50px" width="50px" class="ml-3 rounded-circle"></v-img>
+                                <v-img v-bind:src="imageBaseUrl + friend_request.image" height="50px" width="50px"
+                                    class="ml-3 rounded-circle"></v-img>
                             </v-col>
                             <v-col>
                                 <v-card-text class="pa-0">Request: {{ friend_request.username }}</v-card-text>
                                 <div class="d-flex ustify-space-around">
-                                <v-btn class="mr-1" density="compact" icon="mdi-check" color="green"
-                                    @click="acceptFriendRequest(friend_request.id)"></v-btn>
-                                <v-btn density="compact" icon="mdi-close" color="red"
-                                    @click="rejectFriendRequest(friend_request.id)"></v-btn>
+                                    <v-btn class="mr-1" density="compact" icon="mdi-check" color="green"
+                                        @click="acceptFriendRequest(friend_request.id)"></v-btn>
+                                    <v-btn density="compact" icon="mdi-close" color="red"
+                                        @click="rejectFriendRequest(friend_request.id)"></v-btn>
                                 </div>
                             </v-col>
                         </v-row>
                     </v-card>
 
-                    
-                    <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length" v-for="channel in friend_channels" :to="'/chat/'+ channel.id">
-                    <v-card height="80px" width="145px">
-                        <v-row align="center" class="mt-1 mb-1">
-                            <v-col class="shrink">
-                                <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image" class="ml-3 rounded-circle"></v-img>
-                            </v-col>
-                            <v-col>
-                                <v-card-text class="pa-0 font-weight-regular">{{ channel.friend.username }}</v-card-text>
-                            </v-col>
-                        </v-row>
-                    </v-card>
-                </v-btn>
-                
 
+                    <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length"
+                        v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id, channel.friend.username)">
+                        <v-card height="80px" width="145px">
+                            <v-row align="center" class="mt-1 mb-1">
+                                <v-col class="shrink">
+                                    <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image"
+                                        class="ml-3 rounded-circle"></v-img>
+                                </v-col>
+                                <v-col>
+                                    <v-card-text class="pa-0 font-weight-regular">{{ channel.friend.username }}
+                                    </v-card-text>
+                                </v-col>
+                            </v-row>
+                        </v-card>
+                    </v-btn>
+
+
+
+                </div>
 
             </div>
-            
-                </div>
         </div>
 
 
 
 
-        <div class="lds-loading-bar" v-bind:class="{ 'is-loading': $store.state.isLoading }"></div>
+        <div class="is-loading-bar has-text-centered" v-bind:class="{ 'is-loading': $store.state.isLoading }">
+            <v-progress-circular
+      indeterminate
+      color="blue"
+    ></v-progress-circular>
+        </div>
 
 
 
@@ -168,8 +177,8 @@
 </template>
 
 <script>
-    export default {
 
+    export default {
 
         data() {
             return {
@@ -184,6 +193,7 @@
                 update_profile_picture: null,
                 imageBaseUrl: "http://localhost:8000",
                 friend_channels: [],
+                selectedChannelId: null,
             }
         },
         beforeCreate() {
@@ -197,13 +207,19 @@
                 this.axios.defaults.headers.common['Authorization'] = null
             }
 
-            
+
 
 
         },
         mounted() {
             var route = this.$router.currentRoute.value.name;
+
+            if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
             this.updateFriendRequests()
+            this.getFriendChannels()
             this.interval = setInterval(() => {
                 route = this.$router.currentRoute.value.name;
                 if (route == 'login' || route == 'register') {
@@ -211,10 +227,10 @@
                 }
                 this.updateFriendRequests()
                 this.getFriendChannels()
-               
+
             }, 2000);
 
-            
+
 
         },
         beforeUpdate() {
@@ -227,7 +243,6 @@
             this.username = localStorage.username
         },
         updated() {
-
         },
         computed: {
 
@@ -249,6 +264,10 @@
 
             },
             async sendFriendRequest() {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
                 const formData = {
                     username: this.request_username
                 }
@@ -284,6 +303,11 @@
                 return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
             },
             acceptFriendRequest(requestId) {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
                 const formData = {
                     id: requestId,
                     status: "A"
@@ -295,6 +319,12 @@
                 })
             },
             rejectFriendRequest(requestId) {
+
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
                 const formData = {
                     id: requestId,
                     status: "R"
@@ -305,7 +335,11 @@
                 })
             },
             updateProfile() {
-                
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
                 var formData = new FormData()
 
                 if (this.update_username.length > 1) {
@@ -315,13 +349,15 @@
                     formData.append("image", this.update_profile_picture[0])
                 }
 
-   
-                
+
+
                 const headers = {
                     'Content-Type': 'multipart/form-data'
                 }
 
-                this.axios.put("/api/v1/profile/", formData, {headers: headers}).then(response => {
+                this.axios.put("/api/v1/profile/", formData, {
+                    headers: headers
+                }).then(response => {
                     this.errors = []
 
                     if (response.data.user) {
@@ -352,6 +388,15 @@
                     this.friend_channels = response.data
                 })
             },
+            setChannelId(channel_id, channel_name=null) {
+                this.$store.commit("setSelectedChannelId", channel_id)
+                localStorage.selectedChannelId = channel_id
+                if (channel_name != null) {
+                    this.$store.commit("setSelectedChannelName", channel_name)
+                    localStorage.selectedChannelName = channel_name
+                }
+            },
+           
         }
     }
 </script>
@@ -364,10 +409,7 @@
         margin: 0;
         height: 100%;
         overflow: hidden;
-    }
-    
-    .text-muted {
-        color: #6c757d;
+        background-color: #212121;
     }
 
     .large-text {
@@ -375,26 +417,25 @@
     }
 
     .sidebar {
-        background-color: #3b3b3b;
+        background-color: #616161;
         width: 300px;
         height: 100%;
         position: absolute;
         overflow: hidden;
     }
 
-
     .sidebar-groups {
-        background-color: #252525;
+        background-color: #424242;
         width: 110px;
         height: 100%;
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
-    
+
     .sidebar-friends {
         width: 200px;
         height: 100%;
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
     .section {
@@ -408,6 +449,22 @@
     .channel-flex-box {
         height: 100%;
     }
+    
+    .is-loading-bar {
+        height: 0;
+        overflow: hidden;
+
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+        z-index: 1000;
+        position: fixed;
+        left: 50%;
+        top: 8px;
+
+        &.is-loading {
+            height: 80px;
+        }
+    }
 
     .lds-loading-bar {
         position: fixed;
@@ -415,40 +472,10 @@
         width: 100vw;
         height: 4px;
         background-color: #2ac811;
+        z-index: 1000;
 
         &.is-loading {
             animation: lds-loading-bar 0.2s normal forwards ease-in-out;
-        }
-    }
-
-    @keyframes lds-loading-bar {
-        from {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-
-        20% {
-            opacity: 1;
-        }
-
-        to {
-            transform: translateX(-25%);
-        }
-    }
-
-    @keyframes lds-loading-bar-2 {
-        from {
-            transform: translateX(-25%);
-        }
-
-
-        80% {
-            opacity: 1;
-        }
-
-        to {
-            transform: translateX(0);
-            opacity: 0;
         }
     }
 </style>
