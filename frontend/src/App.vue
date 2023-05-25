@@ -10,9 +10,9 @@
 
                         <v-card class="pa-2">
                             <template v-slot:title>
-                                <v-card-text>
+                                <v-card-title>
                                     Account Settings
-                                </v-card-text>
+                                </v-card-title>
                             </template>
                             <v-form @submit.prevent="updateProfile">
 
@@ -135,7 +135,7 @@
 
 
                     <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length"
-                        v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id)">
+                        v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id, channel.friend.username)">
                         <v-card height="80px" width="145px">
                             <v-row align="center" class="mt-1 mb-1">
                                 <v-col class="shrink">
@@ -160,7 +160,12 @@
 
 
 
-        <div class="lds-loading-bar" v-bind:class="{ 'is-loading': $store.state.isLoading }"></div>
+        <div class="is-loading-bar has-text-centered" v-bind:class="{ 'is-loading': $store.state.isLoading }">
+            <v-progress-circular
+      indeterminate
+      color="blue"
+    ></v-progress-circular>
+        </div>
 
 
 
@@ -208,7 +213,13 @@
         },
         mounted() {
             var route = this.$router.currentRoute.value.name;
+
+            if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
             this.updateFriendRequests()
+            this.getFriendChannels()
             this.interval = setInterval(() => {
                 route = this.$router.currentRoute.value.name;
                 if (route == 'login' || route == 'register') {
@@ -232,7 +243,6 @@
             this.username = localStorage.username
         },
         updated() {
-
         },
         computed: {
 
@@ -254,6 +264,10 @@
 
             },
             async sendFriendRequest() {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
                 const formData = {
                     username: this.request_username
                 }
@@ -289,6 +303,11 @@
                 return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
             },
             acceptFriendRequest(requestId) {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
                 const formData = {
                     id: requestId,
                     status: "A"
@@ -300,6 +319,12 @@
                 })
             },
             rejectFriendRequest(requestId) {
+
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
                 const formData = {
                     id: requestId,
                     status: "R"
@@ -310,6 +335,10 @@
                 })
             },
             updateProfile() {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
 
                 var formData = new FormData()
 
@@ -359,8 +388,13 @@
                     this.friend_channels = response.data
                 })
             },
-            setChannelId(channel_id) {
+            setChannelId(channel_id, channel_name=null) {
                 this.$store.commit("setSelectedChannelId", channel_id)
+                localStorage.selectedChannelId = channel_id
+                if (channel_name != null) {
+                    this.$store.commit("setSelectedChannelName", channel_name)
+                    localStorage.selectedChannelName = channel_name
+                }
             },
            
         }
@@ -375,10 +409,7 @@
         margin: 0;
         height: 100%;
         overflow: hidden;
-    }
-
-    .text-muted {
-        color: #757575;
+        background-color: #212121;
     }
 
     .large-text {
@@ -386,26 +417,25 @@
     }
 
     .sidebar {
-        background-color: #424242;
+        background-color: #616161;
         width: 300px;
         height: 100%;
         position: absolute;
         overflow: hidden;
     }
 
-
     .sidebar-groups {
-        background-color: #616161;
+        background-color: #424242;
         width: 110px;
         height: 100%;
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
 
     .sidebar-friends {
         width: 200px;
         height: 100%;
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
     .section {
@@ -419,6 +449,22 @@
     .channel-flex-box {
         height: 100%;
     }
+    
+    .is-loading-bar {
+        height: 0;
+        overflow: hidden;
+
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+        z-index: 1000;
+        position: fixed;
+        left: 50%;
+        top: 8px;
+
+        &.is-loading {
+            height: 80px;
+        }
+    }
 
     .lds-loading-bar {
         position: fixed;
@@ -426,40 +472,10 @@
         width: 100vw;
         height: 4px;
         background-color: #2ac811;
+        z-index: 1000;
 
         &.is-loading {
             animation: lds-loading-bar 0.2s normal forwards ease-in-out;
-        }
-    }
-
-    @keyframes lds-loading-bar {
-        from {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-
-        20% {
-            opacity: 1;
-        }
-
-        to {
-            transform: translateX(-25%);
-        }
-    }
-
-    @keyframes lds-loading-bar-2 {
-        from {
-            transform: translateX(-25%);
-        }
-
-
-        80% {
-            opacity: 1;
-        }
-
-        to {
-            transform: translateX(0);
-            opacity: 0;
         }
     }
 </style>
