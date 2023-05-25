@@ -11,7 +11,7 @@
          
         <v-img v-bind:src="imageBaseUrl + message.sender.image" height="50px" width="50px" class="rounded-circle"></v-img>
         <v-card flat tile class="message-card">
-          <v-card-text class="timestamp">{{ message.timestamp }}</v-card-text>
+          <v-card-text class="timestamp">{{ message.created }}</v-card-text>
           <v-card-text class="message-text">{{ message.content }}</v-card-text>
         </v-card>
       </div>
@@ -19,10 +19,10 @@
     </v-row>
   </v-container>
   
-    <v-form @submit.prevent="" class="message-container">
+    <v-form @submit.prevent="sendMessage" class="message-container">
       <div class="d-flex ustify-space-around">
 
-        <v-text-field rounded label="Type message here" style="width: calc(100% - 138px)">
+        <v-text-field v-model="message" class="pl-2 pr-2" variant="solo-filled" rounded label="Type message here" style="width: calc(100% - 138px)">
 
         </v-text-field>
 
@@ -44,6 +44,7 @@
         imageBaseUrl: "http://localhost:8000",
         messages: [],
         chatTitle: "Chat - "+localStorage.selectedChannelName,
+        message: ""
       }
     },
     components: {},
@@ -60,7 +61,7 @@
     methods: {
       getMessagesForChannel() {
         this.$store.commit('setIsLoading', true)
-        var channel_id = this.$store.state.selectedChannelId
+        const channel_id = this.$store.state.selectedChannelId
         if (channel_id == null || !this.$store.state.isAuthenticated) {
           return
         }
@@ -74,6 +75,23 @@
         })
         this.$store.commit('setIsLoading', false)
       },
+      sendMessage() {
+        const channel_id = this.$store.state.selectedChannelId
+        if (channel_id == null || !this.$store.state.isAuthenticated) {
+          return
+        }
+        const message = this.message
+        if (message == null || message == "") {
+          return
+        }
+        this.axios.post("/api/v1/channel/messages/" + channel_id, {
+          content: message
+        }).then(response => {
+          this.message = ""
+        }).catch(error => {
+          console.log(JSON.stringify(error))
+        })
+      }
     },
     }
 </script>
@@ -82,6 +100,7 @@
   .chat-container {
     height: calc(100vh - 60px);
     overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
   }
 
@@ -108,8 +127,7 @@
   }
 
   .message-row {
-    height: 80px;
-    width: 90%;
+    width: 100%;
     margin: 4px;
   }
 
