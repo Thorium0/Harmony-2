@@ -87,9 +87,9 @@ class Messages(APIView):
                 dict["content"] = message.content
                 time = message.timestamp
                 if time.date() == datetime.today().date():
-                     dict["timestamp"] = time.strftime("Today at %H:%M:%S")
+                     dict["created"] = time.strftime("Today at %H:%M:%S")
                 else:
-                     dict["timestamp"] = time.strftime("%d/%m/%Y %H:%M")
+                     dict["created"] = time.strftime("%d/%m/%Y %H:%M")
                 dict["sender"] = {
                     "id": message.sender.id,
                     "username": message.sender.username,
