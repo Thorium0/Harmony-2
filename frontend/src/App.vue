@@ -114,7 +114,7 @@
 
 
 
-                    <v-card width="145px" v-if="friend_requests.length" v-for="friend_request in friend_requests"
+                    <v-card width="160px" v-if="friend_requests.length" v-for="friend_request in friend_requests"
                         v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink pr-0">
@@ -134,16 +134,16 @@
                     </v-card>
 
 
-                    <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length"
+                    <v-btn height="80px" width="160px" class="mb-2" v-if="friend_channels.length"
                         v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id, channel.friend.username)">
-                        <v-card height="80px" width="145px">
+                        <v-card height="80px" width="160px">
                             <v-row align="center" class="mt-1 mb-1">
                                 <v-col class="shrink">
                                     <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image"
                                         class="ml-3 rounded-circle"></v-img>
                                 </v-col>
                                 <v-col>
-                                    <v-card-text class="pa-0 font-weight-regular">{{ channel.friend.username }}
+                                    <v-card-text class="pa-0 ma-0 font-weight-regular">{{ channel.friend.username }}
                                     </v-card-text>
                                 </v-col>
                             </v-row>
@@ -191,7 +191,7 @@
                 username: localStorage.username,
                 update_username: "",
                 update_profile_picture: null,
-                imageBaseUrl: "http://localhost:8000",
+                imageBaseUrl: "http://thorium.ddns.net:8000",
                 friend_channels: [],
                 selectedChannelId: null,
             }
@@ -221,6 +221,7 @@
             this.updateFriendRequests()
             this.getFriendChannels()
             this.interval = setInterval(() => {
+                console.log(this.friend_channels[0].friend.username)
                 route = this.$router.currentRoute.value.name;
                 if (route == 'login' || route == 'register') {
                     return
@@ -263,7 +264,7 @@
                 this.$router.push("/login");
 
             },
-            async sendFriendRequest() {
+            sendFriendRequest() {
 
                 if (!this.$store.state.isAuthenticated) {
                     return
@@ -290,7 +291,7 @@
                     }
                 })
             },
-            updateFriendRequests() {
+            async updateFriendRequests() {
                 this.axios.get("/api/v1/request/latest/")
                     .then(response => {
                         this.friend_requests = response.data
@@ -302,7 +303,7 @@
             isMobile() {
                 return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
             },
-            acceptFriendRequest(requestId) {
+            async acceptFriendRequest(requestId) {
 
                 if (!this.$store.state.isAuthenticated) {
                     return
@@ -318,7 +319,7 @@
                     this.getFriendChannels()
                 })
             },
-            rejectFriendRequest(requestId) {
+            async rejectFriendRequest(requestId) {
 
 
                 if (!this.$store.state.isAuthenticated) {
@@ -383,7 +384,7 @@
                     }
                 })
             },
-            getFriendChannels() {
+            async getFriendChannels() {
                 this.axios.get("/api/v1/channel/").then(response => {
                     this.friend_channels = response.data
                 })
@@ -405,12 +406,11 @@
 
 <style lang="scss">
 
-
     html,
     body {
         margin: 0;
         height: 100%;
-        overflow: hidden;
+        overflow: hidden !important;
         background-color: #212121;
     }
 
@@ -435,7 +435,7 @@
 
 
     .sidebar-friends {
-        width: 200px;
+        width: auto;
         height: 100%;
         overflow-y: auto;
     }

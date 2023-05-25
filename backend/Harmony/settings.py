@@ -31,7 +31,7 @@ DEBUG = str(environ.get("DEBUG"))
 
 ALLOWED_HOSTS = [str(environ.get("ALLOWED_HOSTS"))]
 
-CORS_ALLOWED_ORIGIN_REGEXES=['http://localhost:8080', 'http://5.103.162.10:8080', 'http://thoriumserver.ddns.net:8080']
+CORS_ALLOWED_ORIGIN_REGEXES=['http://localhost:8080', 'http://5.103.162.10:8080', 'http://thorium.ddns.net:8080']
 
 
 # Application definition
