@@ -7,6 +7,7 @@
     <v-row align="center" v-if="messages.length" v-for="message in messages" class="message-row">
       <v-card-title class="font-weight-bold">{{ message.sender.username }}</v-card-title>
         <div class="d-flex ustify-space-around message-div">
+          
          
         <v-img v-bind:src="imageBaseUrl + message.sender.image" height="50px" width="50px" class="rounded-circle"></v-img>
         <v-card flat tile class="message-card">

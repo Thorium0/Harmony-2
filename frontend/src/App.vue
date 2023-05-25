@@ -10,9 +10,9 @@
 
                         <v-card class="pa-2">
                             <template v-slot:title>
-                                <v-card-text>
+                                <v-card-title>
                                     Account Settings
-                                </v-card-text>
+                                </v-card-title>
                             </template>
                             <v-form @submit.prevent="updateProfile">
 
@@ -161,7 +161,10 @@
 
 
         <div class="is-loading-bar has-text-centered" v-bind:class="{ 'is-loading': $store.state.isLoading }">
-        <div class="lds-dual-ring"></div>
+            <v-progress-circular
+      indeterminate
+      color="blue"
+    ></v-progress-circular>
         </div>
 
 
@@ -240,7 +243,6 @@
             this.username = localStorage.username
         },
         updated() {
-
         },
         computed: {
 
@@ -447,35 +449,6 @@
     .channel-flex-box {
         height: 100%;
     }
-
-
-    .lds-dual-ring {
-        display: inline-block;
-        width: 80px;
-        height: 80px;
-    }
-
-    .lds-dual-ring:after {
-        content: " ";
-        display: block;
-        width: 64px;
-        height: 64px;
-        margin: 8px;
-        border-radius: 50%;
-        border: 6px solid #ccc;
-        border-color: #ccc transparent #ccc transparent;
-        animation: lds-dual-ring 1.2s linear infinite;
-    }
-
-    @keyframes lds-dual-ring {
-        0% {
-            transform: rotate(0deg);
-        }
-
-        100% {
-            transform: rotate(360deg);
-        }
-    }
     
     .is-loading-bar {
         height: 0;
@@ -483,6 +456,10 @@
 
         -webkit-transition: all 0.3s;
         transition: all 0.3s;
+        z-index: 1000;
+        position: fixed;
+        left: 50%;
+        top: 8px;
 
         &.is-loading {
             height: 80px;
@@ -499,38 +476,6 @@
 
         &.is-loading {
             animation: lds-loading-bar 0.2s normal forwards ease-in-out;
-        }
-    }
-
-    
-    @keyframes lds-loading-bar {
-        from {
-            transform: translateX(-100%);
-            opacity: 0;
-        }
-
-        20% {
-            opacity: 1;
-        }
-
-        to {
-            transform: translateX(-25%);
-        }
-    }
-
-    @keyframes lds-loading-bar-2 {
-        from {
-            transform: translateX(-25%);
-        }
-
-
-        80% {
-            opacity: 1;
-        }
-
-        to {
-            transform: translateX(0);
-            opacity: 0;
         }
     }
 </style>
