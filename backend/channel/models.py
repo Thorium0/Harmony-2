@@ -12,5 +12,6 @@ class Message(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE)
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
     image = models.ImageField(upload_to='files/', blank=True, null=True)
