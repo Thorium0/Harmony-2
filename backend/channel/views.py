@@ -78,7 +78,7 @@ class Messages(APIView):
             group = group.first()
             if not request.user in group.user_set.all():
                 return Response({"error": "You are not in this channel"}, status=400)
-            messages = Message.objects.filter(group=group).order_by('-created')
+            messages = Message.objects.filter(group=group).order_by('created')
 
             data = []
             for message in messages:

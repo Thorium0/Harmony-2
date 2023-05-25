@@ -3,7 +3,7 @@
     <v-card-title class="white--text">{{ chatTitle }}</v-card-title>
   </v-card>
 
-  <v-container fluid pa-0 class="chat-container">
+  <v-container fluid class="chat-container scroll">
     <v-row align="center" v-if="messages.length" v-for="message in messages" class="message-row">
       <v-card-title class="font-weight-bold">{{ message.sender.username }}</v-card-title>
       <div class="d-flex ustify-space-around message-div">
@@ -71,10 +71,12 @@
         this.axios.get("/api/v1/channel/messages/" + channel_id).then(response => {
 
           this.messages = response.data
+          this.scrollToEnd()
 
         }).catch(error => {
           console.log(JSON.stringify(error))
         })
+        
         this.$store.commit('setIsLoading', false)
       },
       sendMessage() {
@@ -104,14 +106,19 @@
             console.log(JSON.stringify(error));
           }
         })
-      }
+      },
+      scrollToEnd() {
+        var container = document.querySelector(".scroll")
+        var scrollHeight = container.scrollHeight;
+        container.scrollTop = scrollHeight;
+      },
     },
   }
 </script>
 
 <style scoped>
   .chat-container {
-    height: calc(100vh - 60px);
+    height: calc(100vh - 110px);
     overflow-y: auto;
     overflow-x: hidden;
     position: relative;
