@@ -24,12 +24,12 @@ BASE_URL = str(environ.get("DOMAIN"))
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*k2iw!+$byztqb0y_#vas&i_%b%yipvd98)y^!@$uzu4mdx_t9'
+SECRET_KEY = str(environ.get("SECRET_KEY"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = str(environ.get("DEBUG"))
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = [str(environ.get("ALLOWED_HOSTS"))]
 
 CORS_ALLOWED_ORIGIN_REGEXES=['http://localhost:8080', 'http://5.103.162.10:8080', 'http://thoriumserver.ddns.net:8080']
 
@@ -55,7 +55,7 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
+    'http://localhost:8080'
 ]
 
 MIDDLEWARE = [
