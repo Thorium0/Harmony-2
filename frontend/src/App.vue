@@ -221,7 +221,6 @@
             this.updateFriendRequests()
             this.getFriendChannels()
             this.interval = setInterval(() => {
-                console.log(this.friend_channels[0].friend.username)
                 route = this.$router.currentRoute.value.name;
                 if (route == 'login' || route == 'register') {
                     return
