@@ -71,7 +71,7 @@
                     <v-dialog v-model="addDialog" width="auto">
                         <template v-slot:activator="{ props }">
 
-                            <v-btn color="grey-darken-1" text="+" height="80px" width="80px" class="ma-1 large-text rounded-circle"
+                            <v-btn text="+" height="80px" width="80px" class="ma-1 large-text rounded-circle"
                                 v-bind="props"></v-btn>
                             <v-btn text="<" height="80px" width="80px" class="ma-1 large-text rounded-circle"
                                 v-if="isMobile()" @click="showSidebar = !showSidebar"></v-btn>
@@ -115,7 +115,7 @@
 
 
                     <v-card width="145px" v-if="friend_requests.length" v-for="friend_request in friend_requests"
-                        v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'" color="grey-darken-1">
+                        v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'">
                         <v-row align="center" class="mt-1 mb-1">
                             <v-col class="shrink pr-0">
                                 <v-img v-bind:src="imageBaseUrl + friend_request.image" height="50px" width="50px"
@@ -135,8 +135,8 @@
 
 
                     <v-btn height="80px" width="145px" class="mb-2" v-if="friend_channels.length"
-                        v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id)">
-                        <v-card height="80px" width="145px" color="grey-darken-1">
+                        v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id, channel.friend.username)">
+                        <v-card height="80px" width="145px">
                             <v-row align="center" class="mt-1 mb-1">
                                 <v-col class="shrink">
                                     <v-img height="50px" width="50px" v-bind:src="imageBaseUrl + channel.friend.image"
@@ -160,7 +160,9 @@
 
 
 
-        <div class="lds-loading-bar" v-bind:class="{ 'is-loading': $store.state.isLoading }"></div>
+        <div class="is-loading-bar has-text-centered" v-bind:class="{ 'is-loading': $store.state.isLoading }">
+        <div class="lds-dual-ring"></div>
+        </div>
 
 
 
@@ -208,7 +210,13 @@
         },
         mounted() {
             var route = this.$router.currentRoute.value.name;
+
+            if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
             this.updateFriendRequests()
+            this.getFriendChannels()
             this.interval = setInterval(() => {
                 route = this.$router.currentRoute.value.name;
                 if (route == 'login' || route == 'register') {
@@ -254,6 +262,10 @@
 
             },
             async sendFriendRequest() {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
                 const formData = {
                     username: this.request_username
                 }
@@ -289,6 +301,11 @@
                 return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
             },
             acceptFriendRequest(requestId) {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
                 const formData = {
                     id: requestId,
                     status: "A"
@@ -300,6 +317,12 @@
                 })
             },
             rejectFriendRequest(requestId) {
+
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
                 const formData = {
                     id: requestId,
                     status: "R"
@@ -310,6 +333,10 @@
                 })
             },
             updateProfile() {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
 
                 var formData = new FormData()
 
@@ -359,8 +386,13 @@
                     this.friend_channels = response.data
                 })
             },
-            setChannelId(channel_id) {
+            setChannelId(channel_id, channel_name=null) {
                 this.$store.commit("setSelectedChannelId", channel_id)
+                localStorage.selectedChannelId = channel_id
+                if (channel_name != null) {
+                    this.$store.commit("setSelectedChannelName", channel_name)
+                    localStorage.selectedChannelName = channel_name
+                }
             },
            
         }
@@ -375,7 +407,7 @@
         margin: 0;
         height: 100%;
         overflow: hidden;
-        background-color: #616161;
+        background-color: #212121;
     }
 
     .large-text {
@@ -383,7 +415,7 @@
     }
 
     .sidebar {
-        background-color: #424242;
+        background-color: #616161;
         width: 300px;
         height: 100%;
         position: absolute;
@@ -391,17 +423,17 @@
     }
 
     .sidebar-groups {
-        background-color: #212121;
+        background-color: #424242;
         width: 110px;
         height: 100%;
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
 
     .sidebar-friends {
         width: 200px;
         height: 100%;
-        overflow-y: scroll;
+        overflow-y: auto;
     }
 
     .section {
@@ -416,18 +448,61 @@
         height: 100%;
     }
 
+
+    .lds-dual-ring {
+        display: inline-block;
+        width: 80px;
+        height: 80px;
+    }
+
+    .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 64px;
+        height: 64px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6px solid #ccc;
+        border-color: #ccc transparent #ccc transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+    }
+
+    @keyframes lds-dual-ring {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .is-loading-bar {
+        height: 0;
+        overflow: hidden;
+
+        -webkit-transition: all 0.3s;
+        transition: all 0.3s;
+
+        &.is-loading {
+            height: 80px;
+        }
+    }
+
     .lds-loading-bar {
         position: fixed;
         animation: lds-loading-bar-2 0.1s normal forwards ease-in-out;
         width: 100vw;
         height: 4px;
         background-color: #2ac811;
+        z-index: 1000;
 
         &.is-loading {
             animation: lds-loading-bar 0.2s normal forwards ease-in-out;
         }
     }
 
+    
     @keyframes lds-loading-bar {
         from {
             transform: translateX(-100%);
