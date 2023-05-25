@@ -78,14 +78,14 @@ class Messages(APIView):
             group = group.first()
             if not request.user in group.user_set.all():
                 return Response({"error": "You are not in this channel"}, status=400)
-            messages = Message.objects.filter(group=group).order_by('-timestamp')
+            messages = Message.objects.filter(group=group).order_by('-created')
 
             data = []
             for message in messages:
                 dict = {}
                 dict["id"] = message.id
                 dict["content"] = message.content
-                time = message.timestamp
+                time = message.created
                 if time.date() == datetime.today().date():
                      dict["created"] = time.strftime("Today at %H:%M:%S")
                 else:
@@ -97,5 +97,26 @@ class Messages(APIView):
                 }
                 data.append(dict)
             return Response(data, status=201)
+        else:
+            return Response({"error": "Channel does not exist"}, status=400)
+        
+
+
+    def post(self, request, channel_id, format=None):
+        group = Group.objects.filter(id=channel_id)
+        if group.exists():
+            group = group.first()
+            if not request.user in group.user_set.all():
+                return Response({"error": "You are not in this channel"}, status=400)
+            data = {
+                "group": group.id,
+                "content": request.data["content"],
+                "sender": request.user.id
+            }
+            serializer = MessageSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            return Response(serializer.errors, status=400)
         else:
             return Response({"error": "Channel does not exist"}, status=400)
