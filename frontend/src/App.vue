@@ -211,25 +211,16 @@
 
 
         },
+        watch: {
+            $route (to, from) {
+                if (to != 'login' && to != 'register') {
+                    this.init()
+                }
+            }
+        },
         mounted() {
-            var route = this.$router.currentRoute.value.name;
 
-            if (!this.$store.state.isAuthenticated) {
-                    return
-                }
-
-            this.updateFriendRequests()
-            this.getFriendChannels()
-            this.interval = setInterval(() => {
-                console.log(this.friend_channels[0].friend.username)
-                route = this.$router.currentRoute.value.name;
-                if (route == 'login' || route == 'register') {
-                    return
-                }
-                this.updateFriendRequests()
-                this.getFriendChannels()
-
-            }, 2000);
+           this.init()
 
 
 
@@ -249,6 +240,25 @@
 
         },
         methods: {
+
+            init() {
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+            clearInterval(this.interval)
+            this.updateFriendRequests()
+            this.getFriendChannels()
+            this.interval = setInterval(() => {
+                var route = this.$router.currentRoute.value.name;
+                if (route == 'login' || route == 'register') {
+                    clearInterval(this.interval)
+                    return
+                }
+                this.updateFriendRequests()
+                this.getFriendChannels()
+
+            }, 2000);
+            },
 
             logout() {
                 this.axios.defaults.headers.common["Authorization"] = ""
@@ -428,14 +438,14 @@
 
     .sidebar-groups {
         background-color: #424242;
-        width: 110px;
+        width: 90px;
         height: 100%;
         overflow-y: auto;
     }
 
 
     .sidebar-friends {
-        width: auto;
+        width: 200px;
         height: 100%;
         overflow-y: auto;
     }

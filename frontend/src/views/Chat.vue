@@ -54,6 +54,13 @@
     mounted() {
       document.title = this.chatTitle
       this.interval = setInterval(() => {
+        var route = this.$router.currentRoute.value.name;
+        
+        if (route == 'login' || route == 'register') {
+                    clearInterval(this.interval)
+                    return
+                }
+
         this.getMessagesForChannel()
       }, 1000);
     },
