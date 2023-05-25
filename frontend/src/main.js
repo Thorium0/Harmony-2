@@ -22,7 +22,7 @@ const vuetify = createVuetify({
     }
 })
 
-axios.defaults.baseURL = 'http://5.103.162.10:8000'
+axios.defaults.baseURL = 'http://thorium.ddns.net:8000'
 
 const app = createApp(App);
 

@@ -43,25 +43,25 @@
     name: 'ChatView',
     data() {
       return {
-        imageBaseUrl: "http://localhost:8000",
+        imageBaseUrl: "http://thorium.ddns.net:8000",
         messages: [],
         chatTitle: "Chat - " + localStorage.selectedChannelName,
-        message: ""
+        message: "",
+        lastMessageId: null,
       }
     },
     components: {},
     mounted() {
-      document.title = 'Chat'
+      document.title = this.chatTitle
       this.interval = setInterval(() => {
         this.getMessagesForChannel()
-      }, 2000);
-
+      }, 1000);
     },
     beforeUpdate() {
       this.getMessagesForChannel()
     },
     methods: {
-      getMessagesForChannel() {
+      async getMessagesForChannel() {
         this.$store.commit('setIsLoading', true)
         const channel_id = this.$store.state.selectedChannelId
         if (channel_id == null || !this.$store.state.isAuthenticated) {
@@ -69,9 +69,16 @@
         }
         this.chatTitle = "Chat - " + localStorage.selectedChannelName
         this.axios.get("/api/v1/channel/messages/" + channel_id).then(response => {
-
-          this.messages = response.data
-          this.scrollToEnd()
+        this.messages = response.data
+        const lastMessageId = this.messages[this.messages.length-1].id
+        if (lastMessageId != this.lastMessageId || lastMessageId == null) {
+          setTimeout(() => {
+            this.scrollToEnd()
+          }, 100
+          );
+          
+        }
+        this.lastMessageId = lastMessageId
 
         }).catch(error => {
           console.log(JSON.stringify(error))
@@ -108,9 +115,9 @@
         })
       },
       scrollToEnd() {
-        var container = document.querySelector(".scroll")
-        var scrollHeight = container.scrollHeight;
-        container.scrollTop = scrollHeight;
+        var container = document.querySelector(".scroll");
+        container.scrollTop = container.scrollHeight;
+
       },
     },
   }
@@ -121,7 +128,6 @@
     height: calc(100vh - 110px);
     overflow-y: auto;
     overflow-x: hidden;
-    position: relative;
   }
 
   .message-container {
