@@ -31,9 +31,9 @@
                                 </v-card-actions>
                             </v-form>
                         </v-card>
-                        <v-card width="400" v-if="errors.length" class="pa-2 mt-2" color="#555500">
+                        <v-card width="400" v-if="userErrors.length" class="pa-2 mt-2" color="#555500">
                             <ul>
-                                <li v-for="error in errors" :key="error">&#x2022; {{ error }}</li>
+                                <li v-for="error in userErrors" :key="error">&#x2022; {{ error }}</li>
                             </ul>
                         </v-card>
                     </v-dialog>
@@ -93,9 +93,9 @@
                                 </v-card-actions>
                             </v-form>
                         </v-card>
-                        <v-card width="400" v-if="errors.length" class="pa-2 mt-2" color="#555500">
+                        <v-card width="400" v-if="requestErrors.length" class="pa-2 mt-2" color="#555500">
                             <ul>
-                                <li v-for="error in errors" :key="error">&#x2022; {{ error }}</li>
+                                <li v-for="error in requestErrors" :key="error">&#x2022; {{ error }}</li>
                             </ul>
                         </v-card>
                     </v-dialog>
@@ -187,11 +187,12 @@
                 showSidebar: true,
                 friend_requests: [],
                 request_username: '',
-                errors: [],
+                requestErrors: [],
+                userErrors: [],
                 username: localStorage.username,
                 update_username: "",
                 update_profile_picture: null,
-                imageBaseUrl: "http://thorium.ddns.net:8000",
+                imageBaseUrl: "http://localhost:8000",
                 friend_channels: [],
                 selectedChannelId: null,
             }
@@ -283,19 +284,19 @@
                     username: this.request_username
                 }
                 this.axios.post("/api/v1/request/create/", formData).then(response => {
-                    this.errors = []
+                    this.requestErrors = []
                     this.addDialog = false
                     this.request_username = ''
                 }).catch(error => {
-                    this.errors = []
+                    this.requestErrors = []
                     if (error.response) {
                         for (const property in error.response.data) {
-                            this.errors.push(`${property}: ${error.response.data[property]}`);
+                            this.requestErrors.push(`${property}: ${error.response.data[property]}`);
                         }
 
                         console.log(JSON.stringify(error.response.data));
                     } else {
-                        this.errors.push("Something went wrong. Please try again.");
+                        this.requestErrors.push("Something went wrong. Please try again.");
 
                         console.log(JSON.stringify(error));
                     }
@@ -369,7 +370,7 @@
                 this.axios.put("/api/v1/profile/", formData, {
                     headers: headers
                 }).then(response => {
-                    this.errors = []
+                    this.userErrors = []
 
                     if (response.data.user) {
                         localStorage.username = response.data.user.username
@@ -378,17 +379,16 @@
                     this.update_profile_picture = null
                     this.accountDialog = false
                 }).catch(error => {
-                    this.errors = []
+                    this.userErrors = []
                     this.update_profile_picture = null
-                    this.accountDialog = false
                     if (error.response) {
                         for (const property in error.response.data) {
-                            this.errors.push(`${property}: ${error.response.data[property]}`);
+                            this.userErrors.push(`${property}: ${error.response.data[property]}`);
                         }
 
                         console.log(JSON.stringify(error.response.data));
                     } else {
-                        this.errors.push("error: Make sure you have filled out the fields correctly.");
+                        this.userErrors.push("error: Make sure you have filled out the fields correctly.");
 
                         console.log(JSON.stringify(error));
                     }
