@@ -135,7 +135,8 @@
 
 
                     <v-btn height="80px" width="160px" class="mb-2" v-if="friend_channels.length"
-                        v-for="channel in friend_channels" :to="'/chat/'+ channel.id" @click="setChannelId(channel.id, channel.friend.username)">
+                        v-for="channel in friend_channels" :to="'/chat/'+ channel.id"
+                        @click="setChannelId(channel.id, channel.friend.username)">
                         <v-card height="80px" width="160px">
                             <v-row align="center" class="mt-1 mb-1">
                                 <v-col class="shrink">
@@ -161,11 +162,20 @@
 
 
         <div class="is-loading-bar has-text-centered" v-bind:class="{ 'is-loading': $store.state.isLoading }">
-            <v-progress-circular
-      indeterminate
-      color="blue"
-    ></v-progress-circular>
+            <v-progress-circular indeterminate color="blue"></v-progress-circular>
         </div>
+
+        <v-dialog v-model="callNoti" persistent width="auto">
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Incoming Call from {{ callName }}</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-btn color="green" @click="acceptCall">Accept</v-btn>
+                    <v-btn color="red" @click="rejectCall">Reject</v-btn>
+                </v-card-text>
+            </v-card>
+        </v-dialog>
 
 
 
@@ -177,6 +187,7 @@
 </template>
 
 <script>
+    import { CometChat } from '@cometchat-pro/chat';
 
     export default {
 
@@ -192,9 +203,13 @@
                 username: localStorage.username,
                 update_username: "",
                 update_profile_picture: null,
-                imageBaseUrl: "http://localhost:8000",
+                imageBaseUrl: "http://thorium.ddns.net:8000",
                 friend_channels: [],
                 selectedChannelId: null,
+                incomingCall: false,
+                callNoti: false,
+                callName: '',
+                session_id: '',
             }
         },
         beforeCreate() {
@@ -213,18 +228,31 @@
 
         },
         watch: {
-            $route (to, from) {
-                if (to != 'login' && to != 'register') {
+            $route(to, from) {
+                if (to.name != 'login' && to.name != 'register') {
                     this.init()
                 }
+                if (to.name != 'call') {
+                    this.loginCometChat()
+                    this.listenCometChat()
+                }
+            
             }
         },
         mounted() {
 
-           this.init()
+            this.init()
+            
 
 
-
+        },
+        created() {
+            this.initCometChat()
+            if (localStorage.CometChatIsLoggedIn!="true" && this.$store.state.isAuthenticated) {
+                this.loginCometChat()
+            }
+            this.listenCometChat()
+            
         },
         beforeUpdate() {
             const route = this.$router.currentRoute.value.name;
@@ -234,31 +262,120 @@
                 this.showSidebar = true
             }
             this.username = localStorage.username
+
+            
         },
         updated() {
+            
         },
         computed: {
-
+            
         },
         methods: {
+            acceptCall() {
+                this.callNoti = false
+                this.$router.push("/call/" + this.session_id)
+            },
+            rejectCall() {
+
+                var sessionID = this.session_id;
+                var globalContext = this;
+                var status = CometChat.CALL_STATUS.REJECTED;
+                CometChat.rejectCall(sessionID, status).then(
+                    call => {
+                        console.log("Call rejected successfully", call);
+                        globalContext.incomingCall = false;
+                        this.callNoti = false
+                    },
+                    error => {
+                        console.log("Call rejection failed with error:", error);
+                    }
+                );
+            },
+            initCometChat() {
+                var appID = process.env.VUE_APP_COMETCHAT_APP_ID;
+
+                CometChat.init(appID).then(
+                    () => {
+                        console.log("[CometChat] Initialization completed successfully");
+                    },
+                    error => {
+                        console.log("[CometChat] Initialization failed with error:", error);
+                    }
+                )
+            },
+
+            loginCometChat() {
+                
+                let apiKey = process.env.VUE_APP_COMETCHAT_API_KEY;
+
+                this.$store.commit('setIsLoading', true)
+                var username = this.lowercaseify(this.username)
+
+                CometChat.login(username, apiKey).then(
+                    () => {
+                        this.$store.commit('setIsLoading', false)
+                        console.log("[CometChat] Login Successful:", {
+                            username: username
+                        });
+                        localStorage.CometChatIsLoggedIn = true
+                    },
+                    error => {
+                        this.$store.commit('setIsLoading', false)
+                        console.log("[CometChat] Login failed with exception:", {
+                            error
+                        });
+                    }
+                )
+        },
+            
+            listenCometChat() {
+                let globalContext = this;
+                var listnerID = this.lowercaseify(this.username);
+                CometChat.addCallListener(
+                    listnerID,
+                    new CometChat.CallListener({
+                        onIncomingCallReceived(call) {
+                            console.log("Incoming call:", call);
+                            globalContext.incomingCall = true;
+                            globalContext.callNoti = true;
+                            globalContext.callName = call.sender.name
+                            globalContext.session_id = call.sessionId;
+                        },
+                        onIncomingCallCancelled(call) {
+                            console.log("Incoming call calcelled:", call);
+                        }
+                    })
+                );
+            },
+            lowercaseify(string) {
+            if (string != null) {
+                for (var i = 0; i < string.length; i++) {
+                    if (string[i] == string[i].toUpperCase()) {
+                        string = string.replace(string[i], "_"+string[i].toLowerCase());
+                    }
+                }
+                return string
+            }
+            },
 
             init() {
                 if (!this.$store.state.isAuthenticated) {
                     return
                 }
-            clearInterval(this.interval)
-            this.updateFriendRequests()
-            this.getFriendChannels()
-            this.interval = setInterval(() => {
-                var route = this.$router.currentRoute.value.name;
-                if (route == 'login' || route == 'register') {
-                    clearInterval(this.interval)
-                    return
-                }
+                clearInterval(this.interval)
                 this.updateFriendRequests()
                 this.getFriendChannels()
+                this.interval = setInterval(() => {
+                    var route = this.$router.currentRoute.value.name;
+                    if (route == 'login' || route == 'register') {
+                        clearInterval(this.interval)
+                        return
+                    }
+                    this.updateFriendRequests()
+                    this.getFriendChannels()
 
-            }, 2000);
+                }, 2000);
             },
 
             logout() {
@@ -272,150 +389,167 @@
 
                 this.accountDialog = false;
 
-                this.$router.push("/login");
+                CometChat.logout().then(
+                    success => {
+                        localStorage.CometChatIsLoggedIn = false
+                        console.log("Logout completed successfully");
+                        console.log(success);
+                        this.$router.push("/login");
+                    },
+                    error => {
+                        //Logout failed with exception
+                        console.log("Logout failed with exception:", {
+                            error
+                        });
+                    });
 
-            },
-            sendFriendRequest() {
+            
+                    },
+                    sendFriendRequest() {
 
-                if (!this.$store.state.isAuthenticated) {
-                    return
-                }
-                const formData = {
-                    username: this.request_username
-                }
-                this.axios.post("/api/v1/request/create/", formData).then(response => {
-                    this.requestErrors = []
-                    this.addDialog = false
-                    this.request_username = ''
-                }).catch(error => {
-                    this.requestErrors = []
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.requestErrors.push(`${property}: ${error.response.data[property]}`);
+                        if (!this.$store.state.isAuthenticated) {
+                            return
                         }
-
-                        console.log(JSON.stringify(error.response.data));
-                    } else {
-                        this.requestErrors.push("Something went wrong. Please try again.");
-
-                        console.log(JSON.stringify(error));
-                    }
-                })
-            },
-            async updateFriendRequests() {
-                this.axios.get("/api/v1/request/latest/")
-                    .then(response => {
-                        this.friend_requests = response.data
-                    })
-                    .catch(error => {
-                        console.log(JSON.stringify(error))
-                    })
-            },
-            isMobile() {
-                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-            },
-            async acceptFriendRequest(requestId) {
-
-                if (!this.$store.state.isAuthenticated) {
-                    return
-                }
-
-                const formData = {
-                    id: requestId,
-                    status: "A"
-                }
-
-                this.axios.post("/api/v1/request/set/", formData).then(response => {
-                    this.updateFriendRequests()
-                    this.getFriendChannels()
-                })
-            },
-            async rejectFriendRequest(requestId) {
-
-
-                if (!this.$store.state.isAuthenticated) {
-                    return
-                }
-
-                const formData = {
-                    id: requestId,
-                    status: "R"
-                }
-
-                this.axios.post("/api/v1/request/set/", formData).then(response => {
-                    this.updateFriendRequests()
-                })
-            },
-            updateProfile() {
-
-                if (!this.$store.state.isAuthenticated) {
-                    return
-                }
-
-                var formData = new FormData()
-
-                if (this.update_username.length > 1) {
-                    formData.append("username", this.update_username)
-                }
-                if (this.update_profile_picture != null) {
-                    formData.append("image", this.update_profile_picture[0])
-                }
-
-
-
-                const headers = {
-                    'Content-Type': 'multipart/form-data'
-                }
-
-                this.axios.put("/api/v1/profile/", formData, {
-                    headers: headers
-                }).then(response => {
-                    this.userErrors = []
-
-                    if (response.data.user) {
-                        localStorage.username = response.data.user.username
-                    }
-                    this.update_username = ""
-                    this.update_profile_picture = null
-                    this.accountDialog = false
-                }).catch(error => {
-                    this.userErrors = []
-                    this.update_profile_picture = null
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.userErrors.push(`${property}: ${error.response.data[property]}`);
+                        const formData = {
+                            username: this.request_username
                         }
+                        this.axios.post("/api/v1/request/create/", formData).then(response => {
+                            this.requestErrors = []
+                            this.addDialog = false
+                            this.request_username = ''
+                        }).catch(error => {
+                            this.requestErrors = []
+                            if (error.response) {
+                                for (const property in error.response.data) {
+                                    this.requestErrors.push(
+                                    `${property}: ${error.response.data[property]}`);
+                                }
 
-                        console.log(JSON.stringify(error.response.data));
-                    } else {
-                        this.userErrors.push("error: Make sure you have filled out the fields correctly.");
+                                console.log(JSON.stringify(error.response.data));
+                            } else {
+                                this.requestErrors.push("Something went wrong. Please try again.");
 
-                        console.log(JSON.stringify(error));
-                    }
-                })
-            },
-            async getFriendChannels() {
-                this.axios.get("/api/v1/channel/").then(response => {
-                    this.friend_channels = response.data
-                })
-            },
-            setChannelId(channel_id, channel_name=null) {
-                this.$store.commit("setSelectedChannelId", channel_id)
-                localStorage.selectedChannelId = channel_id
-                if (channel_name != null) {
-                    this.$store.commit("setSelectedChannelName", channel_name)
-                    localStorage.selectedChannelName = channel_name
+                                console.log(JSON.stringify(error));
+                            }
+                        })
+                    },
+                    async updateFriendRequests() {
+                            this.axios.get("/api/v1/request/latest/")
+                                .then(response => {
+                                    this.friend_requests = response.data
+                                })
+                                .catch(error => {
+                                    console.log(JSON.stringify(error))
+                                })
+                        },
+                        isMobile() {
+                            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator
+                                .userAgent)
+                        },
+                        async acceptFriendRequest(requestId) {
+
+                                if (!this.$store.state.isAuthenticated) {
+                                    return
+                                }
+
+                                const formData = {
+                                    id: requestId,
+                                    status: "A"
+                                }
+
+                                this.axios.post("/api/v1/request/set/", formData).then(response => {
+                                    this.updateFriendRequests()
+                                    this.getFriendChannels()
+                                })
+                            },
+                            async rejectFriendRequest(requestId) {
+
+
+                                    if (!this.$store.state.isAuthenticated) {
+                                        return
+                                    }
+
+                                    const formData = {
+                                        id: requestId,
+                                        status: "R"
+                                    }
+
+                                    this.axios.post("/api/v1/request/set/", formData).then(response => {
+                                        this.updateFriendRequests()
+                                    })
+                                },
+                                updateProfile() {
+
+                                    if (!this.$store.state.isAuthenticated) {
+                                        return
+                                    }
+
+                                    var formData = new FormData()
+
+                                    if (this.update_username.length > 1) {
+                                        formData.append("username", this.update_username)
+                                    }
+                                    if (this.update_profile_picture != null) {
+                                        formData.append("image", this.update_profile_picture[0])
+                                    }
+
+
+
+                                    const headers = {
+                                        'Content-Type': 'multipart/form-data'
+                                    }
+
+                                    this.axios.put("/api/v1/profile/", formData, {
+                                        headers: headers
+                                    }).then(response => {
+                                        this.userErrors = []
+
+                                        if (response.data.user) {
+                                            localStorage.username = response.data.user.username
+                                        }
+                                        this.update_username = ""
+                                        this.update_profile_picture = null
+                                        this.accountDialog = false
+                                    }).catch(error => {
+                                        this.userErrors = []
+                                        this.update_profile_picture = null
+                                        if (error.response) {
+                                            for (const property in error.response.data) {
+                                                this.userErrors.push(
+                                                    `${property}: ${error.response.data[property]}`);
+                                            }
+
+                                            console.log(JSON.stringify(error.response.data));
+                                        } else {
+                                            this.userErrors.push(
+                                                "error: Make sure you have filled out the fields correctly."
+                                                );
+
+                                            console.log(JSON.stringify(error));
+                                        }
+                                    })
+                                },
+                                async getFriendChannels() {
+                                        this.axios.get("/api/v1/channel/").then(response => {
+                                            this.friend_channels = response.data
+                                        })
+                                    },
+                                    setChannelId(channel_id, channel_name = null) {
+                                        this.$store.commit("setSelectedChannelId", channel_id)
+                                        localStorage.selectedChannelId = channel_id
+                                        if (channel_name != null) {
+                                            this.$store.commit("setSelectedChannelName", channel_name)
+                                            localStorage.selectedChannelName = channel_name
+                                        }
+                                    },
+
                 }
-            },
-           
-        }
-    }
+            }
 </script>
 
 
 
 <style lang="scss">
-
     html,
     body {
         margin: 0;
@@ -461,7 +595,7 @@
     .channel-flex-box {
         height: 100%;
     }
-    
+
     .is-loading-bar {
         height: 0;
         overflow: hidden;

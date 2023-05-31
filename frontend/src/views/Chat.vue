@@ -1,6 +1,9 @@
 <template>
   <v-card class="navbar">
+    <div class="d-flex ustify-space-around">
     <v-card-title class="white--text">{{ chatTitle }}</v-card-title>
+    <v-btn class="call-btn" icon="mdi-phone" @click="call()"></v-btn>
+  </div>
   </v-card>
 
   <v-container fluid class="chat-container scroll">
@@ -39,6 +42,8 @@
 </template>
 
 <script>
+import { CometChat } from '@cometchat-pro/chat';
+
   export default {
     name: 'ChatView',
     data() {
@@ -48,9 +53,13 @@
         chatTitle: "Chat - " + localStorage.selectedChannelName,
         message: "",
         lastMessageId: null,
+        username: localStorage.username,
       }
     },
     components: {},
+    created() {
+  
+    },
     mounted() {
       document.title = this.chatTitle
       this.interval = setInterval(() => {
@@ -68,6 +77,9 @@
       this.getMessagesForChannel()
     },
     methods: {
+      call() {
+        this.$router.push('/call/null')
+      },
       async getMessagesForChannel() {
         this.$store.commit('setIsLoading', true)
         const channel_id = this.$store.state.selectedChannelId
@@ -135,6 +147,12 @@
     height: calc(100vh - 110px);
     overflow-y: auto;
     overflow-x: hidden;
+  }
+
+  .call-btn {
+    float: right;
+    margin-left: auto; 
+  margin-right: 0;
   }
 
   .message-container {

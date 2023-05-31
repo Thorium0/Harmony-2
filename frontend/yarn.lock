@@ -961,6 +961,11 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     "to-fast-properties" "^2.0.0"
 
+"@cometchat-pro/chat@^3.0.12":
+  "integrity" "sha512-WS8lwdV4OHDEFwez6QaDtWgU1g6YsouOdHsHJla7CaNBiH0CqOrqEHPRQ0vY9GzIMyM+I4W3uuXS88aP9JjdpQ=="
+  "resolved" "https://registry.npmjs.org/@cometchat-pro/chat/-/chat-3.0.12.tgz"
+  "version" "3.0.12"
+
 "@discoveryjs/json-ext@0.5.7":
   "integrity" "sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw=="
   "resolved" "https://registry.npmmirror.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz"

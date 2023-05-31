@@ -3,6 +3,7 @@ import LoginView from '../views/Login.vue'
 import RegisterView from '../views/Register.vue'
 import AboutView from '../views/About.vue'
 import ChatView from '../views/Chat.vue'
+import CallView from '../views/Call.vue'
 import store from '../store'
 const routes = [
   {
@@ -27,6 +28,14 @@ const routes = [
     path: '/chat/:chat_id',
     name: 'chat',
     component: ChatView,
+    meta: {
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/call/:session_id',
+    name: 'call',
+    component: CallView,
     meta: {
       requiresAuth: true
     }
