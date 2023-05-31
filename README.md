@@ -11,6 +11,7 @@ Libraries used:
 - Django rest_framework
 - corsheaders
 - djoser
+- CometChat
 
 Requirements:
 - Installs
@@ -20,5 +21,5 @@ Requirements:
 - Library install commands
   - pip install -r requirements.txt
   - npm install -g @vue/cli
-  - npm install axios yarn vuetify@3.3.0
+  - npm install yarn vuetify@3.3.0
   - cd frontend && npm install

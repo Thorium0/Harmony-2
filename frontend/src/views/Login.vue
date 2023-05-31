@@ -58,8 +58,8 @@ import axios from 'axios';
                         username: this.username,
                         password: this.password
                     }
-
-                    this.axios.post("/api/v1/obtain-auth-token/", formData)//this.axios.post("/api/v1/token/login", formData)
+     
+                    this.axios.post("/api/v1/obtain-auth-token/", formData)
                         .then(response => {
                             this.errors = [];
                             const token = response.data.token;
@@ -72,7 +72,7 @@ import axios from 'axios';
                             localStorage.setItem("username", this.username);
 
                             const toPath = this.$route.query.to || "/";
-
+            
                             this.$router.push(toPath);
                         }).catch(error => {
                             this.errors = [];
@@ -88,7 +88,7 @@ import axios from 'axios';
                                 console.log(JSON.stringify(error));
                             }
                         })
-                }
+                },
         },
         mounted() {
             document.title = 'Login | Harmony'

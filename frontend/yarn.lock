@@ -961,6 +961,11 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     "to-fast-properties" "^2.0.0"
 
+"@cometchat-pro/chat@^3.0.12":
+  "integrity" "sha512-WS8lwdV4OHDEFwez6QaDtWgU1g6YsouOdHsHJla7CaNBiH0CqOrqEHPRQ0vY9GzIMyM+I4W3uuXS88aP9JjdpQ=="
+  "resolved" "https://registry.npmjs.org/@cometchat-pro/chat/-/chat-3.0.12.tgz"
+  "version" "3.0.12"
+
 "@discoveryjs/json-ext@0.5.7":
   "integrity" "sha512-dBVuXR082gk3jsFp7Rd/JI4kytwGHecnCoTtXFb7DB6CNHp4rg5k1bhg0nWdLGLnOV71lmDzGQaLMy8iPLY0pw=="
   "resolved" "https://registry.npmmirror.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz"
@@ -2103,21 +2108,6 @@
   dependencies:
     "base64-js" "^1.3.1"
     "ieee754" "^1.1.13"
-
-"bulma-prefers-dark@^0.1.0-beta.1":
-  "integrity" "sha512-ti4sKxIIrTAvGtsYc9Rk66SUZSH/j63EU1hApQijQVlKFF0qBLGSb8E16HhI83KJaIeYP4aAHQv2tj0ara831A=="
-  "resolved" "https://registry.npmjs.org/bulma-prefers-dark/-/bulma-prefers-dark-0.1.0-beta.1.tgz"
-  "version" "0.1.0-beta.1"
-
-"bulma-toast@^2.4.2":
-  "integrity" "sha512-c3ehyeXhhvxevKICP1VKsFtZlQH+H6/S+yYY4TFyLRfkbw3mh71eGazlNc/YEIvXQSbxHpD2f+WDc02xECuV9g=="
-  "resolved" "https://registry.npmjs.org/bulma-toast/-/bulma-toast-2.4.2.tgz"
-  "version" "2.4.2"
-
-"bulma@^0.9.4":
-  "integrity" "sha512-86FlT5+1GrsgKbPLRRY7cGDg8fsJiP/jzTqXXVqiUZZ2aZT8uemEOHlU1CDU+TxklPEZ11HZNNWclRBBecP4CQ=="
-  "resolved" "https://registry.npmjs.org/bulma/-/bulma-0.9.4.tgz"
-  "version" "0.9.4"
 
 "bytes@3.0.0":
   "integrity" "sha512-pMhOfFDPiv9t5jjIXkHosWmkSyQbvsgEVNkz0ERHbuLh2T/7j4Mqqpz523Fe8MVY89KC6Sh/QfS2sM+SjgFDcw=="
