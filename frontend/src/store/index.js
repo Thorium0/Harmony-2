@@ -7,6 +7,7 @@ export default createStore({
         isLoading: false,
         selectedChannelId: null,
         selectedChannelName: null,
+        showSidebar: true,
     },
     mutations: {
         initializeStore(state) {
@@ -43,6 +44,9 @@ export default createStore({
         },
         removeSelectedChannelName(state) {
             state.selectedChannelName = null
+        },
+        setShowSidebar(state, status) {
+            state.showSidebar = status
         }
     },
     actions: {

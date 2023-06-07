@@ -1,5 +1,5 @@
 <template>
-    <div class="form-card">
+    <div class="form-card align-center justify-center d-flex ml-1 mr-1">
         <v-card width="400" height="360" title="Register" subtitle="If you already have an account go to login"
             class="pa-2">
             <form @submit.prevent="submitForm">
@@ -37,9 +37,7 @@
 </template>
 
 <script>
-    import {
-        CometChat
-    } from '@cometchat-pro/chat';
+    import { CometChat } from '@cometchat-pro/chat';
     export default {
         name: 'RegisterView',
         data() {

@@ -1,6 +1,7 @@
 <template>
   <v-card class="navbar">
     <div class="d-flex ustify-space-around">
+      <v-btn icon="mdi-menu" @click="toggleShowsidebar"></v-btn>
     <v-card-title class="white--text">{{ chatTitle }}</v-card-title>
     <v-btn class="call-btn" icon="mdi-phone" @click="call()"></v-btn>
   </div>
@@ -100,7 +101,7 @@ import { CometChat } from '@cometchat-pro/chat';
         this.lastMessageId = lastMessageId
 
         }).catch(error => {
-          console.log(JSON.stringify(error))
+          //console.log(JSON.stringify(error))
         })
         
         this.$store.commit('setIsLoading', false)
@@ -138,6 +139,12 @@ import { CometChat } from '@cometchat-pro/chat';
         container.scrollTop = container.scrollHeight;
 
       },
+      toggleShowsidebar() {
+        var showSidebar = this.$store.state.showSidebar;
+       
+        this.$store.commit('setShowSidebar', !showSidebar)
+ 
+      }
     },
   }
 </script>
@@ -156,9 +163,10 @@ import { CometChat } from '@cometchat-pro/chat';
   }
 
   .message-container {
+    padding-top: 3px;
     height: 60px;
-    position: fixed;
-    width: calc(100% - 310px);
+    position: relative;
+    width: 100%;
     bottom: 0;
   }
 

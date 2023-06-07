@@ -1,6 +1,7 @@
 <template>
     <div id="wrapper">
-        <div v-if="showSidebar" class="sidebar">
+        <v-layout>
+        <v-navigation-drawer :touchless="true" permanent width="300" v-model="showSidebar" class="sidebar">
             <div class="myaccount-container">
                 <v-card>
                     <v-dialog v-model="accountDialog" width="auto">
@@ -68,19 +69,18 @@
 
 
 
-                    <v-dialog v-model="addDialog" width="auto">
+                    <v-dialog v-model="addGroupDialog" width="auto">
                         <template v-slot:activator="{ props }">
 
                             <v-btn text="+" height="80px" width="80px" class="ma-1 large-text rounded-circle"
                                 v-bind="props"></v-btn>
-                            <v-btn text="<" height="80px" width="80px" class="ma-1 large-text rounded-circle"
-                                v-if="isMobile()" @click="showSidebar = !showSidebar"></v-btn>
+                            
                         </template>
 
-                        <v-card width="400" height="220" title="Send Friend Request"
-                            subtitle="Enter friend's username to send a friend request" class="pa-2">
-                            <v-form @submit.prevent="sendFriendRequest">
-                                <v-text-field v-model="request_username" :counter="10" label="Note: Case-sensitive"
+                        <v-card width="400" height="220" title="Join group"
+                            subtitle="Enter group name to create or join group" class="pa-2">
+                            <v-form @submit.prevent="JoinGroup">
+                                <v-text-field v-model="request_group_name" :counter="10" label="Note: Case-sensitive"
                                     required>
                                 </v-text-field>
 
@@ -88,8 +88,8 @@
 
 
                                 <v-card-actions>
-                                    <v-btn color="primary" type="submit">Send</v-btn>
-                                    <v-btn color="secondary" @click="addDialog = false">Close</v-btn>
+                                    <v-btn color="primary" type="submit">Commit</v-btn>
+                                    <v-btn color="secondary" @click="addGroupDialog = false">Close</v-btn>
                                 </v-card-actions>
                             </v-form>
                         </v-card>
@@ -102,7 +102,7 @@
 
 
 
-
+                   
 
 
 
@@ -151,13 +151,45 @@
                         </v-card>
                     </v-btn>
 
+                    <v-dialog v-model="addDialog" width="auto">
+                        <template v-slot:activator="{ props }">
+
+                            <v-btn icon="mdi-plus" height="40px" width="150px" class="ma-1 rounded-pill"
+                                v-bind="props"></v-btn>
+
+                        </template>
+
+                        <v-card width="400" height="220" title="Send Friend Request"
+                            subtitle="Enter friend's username to send a friend request" class="pa-2">
+                            <v-form @submit.prevent="sendFriendRequest">
+                                <v-text-field v-model="request_username" :counter="10" label="Note: Case-sensitive"
+                                    required>
+                                </v-text-field>
+
+
+
+
+                                <v-card-actions>
+                                    <v-btn color="primary" type="submit">Send</v-btn>
+                                    <v-btn color="secondary" @click="addDialog = false">Close</v-btn>
+                                </v-card-actions>
+                            </v-form>
+                        </v-card>
+                        <v-card width="400" v-if="requestErrors.length" class="pa-2 mt-2" color="#555500">
+                            <ul>
+                                <li v-for="error in requestErrors" :key="error">&#x2022; {{ error }}</li>
+                            </ul>
+                        </v-card>
+                    </v-dialog>
+
 
 
                 </div>
 
             </div>
-        </div>
-
+           
+        </v-navigation-drawer>
+    </v-layout>
 
 
 
@@ -195,7 +227,8 @@
             return {
                 accountDialog: false,
                 addDialog: false,
-                showSidebar: true,
+                addGroupDialog: false,
+                showSidebar: false,
                 friend_requests: [],
                 request_username: '',
                 requestErrors: [],
@@ -210,6 +243,8 @@
                 callNoti: false,
                 callName: '',
                 session_id: '',
+                sidebar_icon: '<',
+                request_group_name: '',
             }
         },
         beforeCreate() {
@@ -255,18 +290,21 @@
             
         },
         beforeUpdate() {
-            const route = this.$router.currentRoute.value.name;
-            if (route == 'login' || route == 'register') {
-                this.showSidebar = false
-            } else {
-                this.showSidebar = true
-            }
             this.username = localStorage.username
 
+            var showSidebar = this.$store.state.showSidebar
+            const route = this.$router.currentRoute.value.name;
+            if (showSidebar && !(route == 'login' || route == 'register')) {
+                this.showSidebar = true
+                document.getElementsByClassName("section")[0].style.marginLeft = "300px";
+            } else {
+                this.showSidebar = false
+                document.getElementsByClassName("section")[0].style.marginLeft = "0";
+            }
             
         },
         updated() {
-            
+          
         },
         computed: {
             
@@ -375,7 +413,11 @@
                     this.updateFriendRequests()
                     this.getFriendChannels()
 
+                   
+
                 }, 2000);
+
+
             },
 
             logout() {
@@ -432,6 +474,15 @@
                                 console.log(JSON.stringify(error));
                             }
                         })
+                    },
+                    JoinGroup() {
+                        if (!this.$store.state.isAuthenticated) {
+                            return
+                        }
+
+                        const formData = {
+                            name: this.request_group_name
+                        }
                     },
                     async updateFriendRequests() {
                             this.axios.get("/api/v1/request/latest/")
@@ -562,26 +613,31 @@
         font-size: 60px !important;
     }
 
+    .v-navigation-drawer__content {
+        overflow: hidden !important;
+    }
+
     .sidebar {
-        background-color: #616161;
-        width: 300px;
         height: 100%;
-        position: absolute;
+        width: auto;
         overflow: hidden;
     }
 
     .sidebar-groups {
         background-color: #424242;
-        width: 90px;
+        width: fit-content;
         height: 100%;
         overflow-y: auto;
+        overflow-x: hidden;
     }
 
 
     .sidebar-friends {
-        width: 200px;
+        background-color: #616161;
         height: 100%;
+        width: auto;
         overflow-y: auto;
+        overflow-x: hidden;
     }
 
     .section {
@@ -602,7 +658,7 @@
 
         -webkit-transition: all 0.3s;
         transition: all 0.3s;
-        z-index: 1000;
+        z-index: 10000;
         position: fixed;
         left: 50%;
         top: 8px;
