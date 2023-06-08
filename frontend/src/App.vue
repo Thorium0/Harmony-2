@@ -375,6 +375,9 @@
                     new CometChat.CallListener({
                         onIncomingCallReceived(call) {
                             console.log("Incoming call:", call);
+                            if (globalContext.username == call.sender.name) {
+                                return
+                            }
                             globalContext.incomingCall = true;
                             globalContext.callNoti = true;
                             globalContext.callName = call.sender.name
