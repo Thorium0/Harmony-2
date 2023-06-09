@@ -1,5 +1,5 @@
 <template>
-    <div class="form-card">
+    <div class="form-card align-center justify-center d-flex ml-1 mr-1">
         <v-card width="400" height="280" title="Login" subtitle="If you are new go to register" class="pa-2">
             <form @submit.prevent="submitForm">
                 <v-text-field v-model="username" :counter="10" label="username" required></v-text-field>
@@ -97,7 +97,7 @@ import axios from 'axios';
 </script>
 
 <style lang="scss">
-    .form-card {
+.form-card {
         margin-left: calc(50% - 320px);
         margin-top: calc(50vh - 250px);
     }
