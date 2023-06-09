@@ -21,6 +21,8 @@ class FriendChannels(APIView):
         data = []
 
         for group in groups:
+            if group.name[0] == "$":
+                continue
             data_group = {}
             data_group["name"] = group.name
             data_group["id"] = group.id
@@ -66,7 +68,75 @@ def delGroup(instance):
 
 
 
+class GroupChannels(APIView):
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
 
+    def get(self, request, format=None):
+        groups = request.user.groups.all()
+       
+        data = []
+
+        for group in groups:
+            if group.name[0] != "$":
+                continue
+            data_group = {}
+            data_group["name"] = group.name
+            data_group["id"] = group.id
+            members = User.objects.filter(groups__name=group.name)
+            data_group["friend"] = []
+            for member in members:
+                data_group["friend"].append({
+                    "id": member.id,
+                    "username": member.username,
+                    "image": member.profile.image.url
+                })
+
+           
+            data.append(data_group)
+
+        return Response(data, status=201)
+    
+
+    def post(self, request, format=None):
+        name = request.data["name"]
+        password = request.data["password"]
+        action = request.data["action"]
+        
+        group_key = "$"+name+"_"+password
+        group = Group.objects.filter(name__regex=f'^\${name}_+')
+        
+        if action == "create":
+            if group.exists():
+                return Response({"error": "Group already exists"}, status=400)
+            else:
+                group = Group.objects.create(name=group_key)
+
+
+
+            user_instance = request.user
+
+            user_instance.groups.add(group)
+        
+            return Response({"success":"Group created"}, status=201)
+        
+        elif action == "join":
+            if group.exists():
+                group = group.first()
+                if group.name != group_key:
+                    return Response({"error": "Wrong password"}, status=400)
+                if not request.user in group.user_set.all():
+                    user_instance = request.user
+                    user_instance.groups.add(group)
+                    return Response({"success":"Group joined"}, status=201)
+                else:
+                    return Response({"error": "You are already in this group"}, status=400)
+            else:
+                return Response({"error": "Group does not exist"}, status=400)
+        else:
+            return Response({"error": "Invalid action"}, status=400)
+    
+    
 class Messages(APIView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
