@@ -1,6 +1,6 @@
 <template>
     <v-card v-if="waiting">
-     <v-card-title>Calling {{ receiver_id }}...</v-card-title>
+     <v-card-title>Calling {{ receiver_id }}...{{ waiting }}</v-card-title>
     </v-card>
     <div  id="callScreen"></div>
 </template>
