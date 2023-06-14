@@ -2,7 +2,9 @@
     <v-card v-if="waiting">
      <v-card-title>Calling {{ receiver_id }}...</v-card-title>
     </v-card>
-    <div  id="callScreen"></div>
+   
+    <div id="callScreen"></div>
+   
 </template>
 
 <script>
@@ -206,8 +208,5 @@
 <style scoped>
     #callScreen {
         height: 100%;
-    }
-    .local-video-container, .video-container {
-        justify-content: none !important;
     }
 </style>
