@@ -2,7 +2,7 @@
     <div class="form-card align-center justify-center d-flex ml-1 mr-1">
         <v-card width="400" height="280" title="Login" subtitle="If you are new go to register" class="pa-2">
             <form @submit.prevent="submitForm">
-                <v-text-field v-model="username" :counter="10" label="username" required></v-text-field>
+                <v-text-field v-model="username" :counter="25" label="username" required></v-text-field>
 
 
                 <v-text-field v-model="password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"

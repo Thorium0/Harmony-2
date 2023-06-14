@@ -3,7 +3,7 @@
         <v-card width="400" height="360" title="Register" subtitle="If you already have an account go to login"
             class="pa-2">
             <form @submit.prevent="submitForm">
-                <v-text-field v-model="username" :counter="10" label="username" required></v-text-field>
+                <v-text-field v-model="username" :counter="25" label="username" required></v-text-field>
 
 
                 <v-text-field v-model="password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
