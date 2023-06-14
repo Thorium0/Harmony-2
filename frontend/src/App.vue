@@ -54,48 +54,46 @@
 
 
 
-                    <v-btn height="80px" width="80px" max-width="80" class="ma-1 rounded-circle">
-                        <img src="//placehold.it/80x80" class="rounded-circle">
+                    <v-btn v-if="group_channels.length" v-for="channel in group_channels" height="80px" width="80px" max-width="80" class="ma-1 rounded-circle">
+                        <img :src="imageBaseUrl+channel.image" height="80" width="80" class="rounded-circle">
                     </v-btn>
-                    <v-btn height="80px" width="80px" max-width="80" class="ma-1 rounded-circle">
-                        <img src="//placehold.it/80x80" class="rounded-circle">
-                    </v-btn>
-                    <v-btn height="80px" width="80px" max-width="80" class="ma-1 rounded-circle">
-                        <img src="//placehold.it/80x80" class="rounded-circle">
-                    </v-btn>
-                    <v-btn height="80px" width="80px" max-width="80" class="ma-1 rounded-circle">
-                        <img src="//placehold.it/80x80" class="rounded-circle">
-                    </v-btn>
+           
 
 
 
                     <v-dialog v-model="addGroupDialog" width="auto">
                         <template v-slot:activator="{ props }">
 
-                            <v-btn text="+" height="80px" width="80px" class="ma-1 large-text rounded-circle"
+                            <v-btn text="+" height="80px" width="80px" max-width="80" class="ma-1 large-text rounded-circle"
                                 v-bind="props"></v-btn>
                             
                         </template>
 
-                        <v-card width="400" height="220" title="Join group"
-                            subtitle="Enter group name to create or join group" class="pa-2">
-                            <v-form @submit.prevent="JoinGroup">
+                        <v-card width="400" title="Create/Join group"
+                            subtitle="Enter group name and password to create or join group" class="pa-2">
+                            <v-form @submit.prevent="">
                                 <v-text-field v-model="request_group_name" :counter="10" label="Note: Case-sensitive"
                                     required>
+                                </v-text-field>
+
+                                <v-text-field v-model="request_group_password" :append-icon="groupPassShow ? 'mdi-eye' : 'mdi-eye-off'"
+                    :rules="[groupRules.required, groupRules.min]" :type="groupPassShow ? 'text' : 'password'" :counter="20"
+                    hint="At least 8 characters" @click:append="groupPassShow = !groupPassShow" label="password" required>
                                 </v-text-field>
 
 
 
 
                                 <v-card-actions>
-                                    <v-btn color="primary" type="submit">Commit</v-btn>
-                                    <v-btn color="secondary" @click="addGroupDialog = false">Close</v-btn>
+                                    <v-btn color="primary" type="submit" @click="commitGroup('join')">Join</v-btn>
+                                    <v-btn color="secondary" type="submit" @click="commitGroup('create')">Create</v-btn>
+                                    <v-btn color="red" @click="addGroupDialog = false">Close</v-btn>
                                 </v-card-actions>
                             </v-form>
                         </v-card>
-                        <v-card width="400" v-if="requestErrors.length" class="pa-2 mt-2" color="#555500">
+                        <v-card width="400" v-if="groupErrors.length" class="pa-2 mt-2" color="#555500">
                             <ul>
-                                <li v-for="error in requestErrors" :key="error">&#x2022; {{ error }}</li>
+                                <li v-for="error in groupErrors" :key="error">&#x2022; {{ error }}</li>
                             </ul>
                         </v-card>
                     </v-dialog>
@@ -233,11 +231,13 @@
                 request_username: '',
                 requestErrors: [],
                 userErrors: [],
+                groupErrors: [],
                 username: localStorage.username,
                 update_username: "",
                 update_profile_picture: null,
                 imageBaseUrl: "http://thorium.ddns.net:8000",
                 friend_channels: [],
+                group_channels: [],
                 selectedChannelId: null,
                 incomingCall: false,
                 callNoti: false,
@@ -245,6 +245,14 @@
                 session_id: '',
                 sidebar_icon: '<',
                 request_group_name: '',
+                request_group_password: '',
+
+
+                groupPassShow: false,
+                groupRules: {
+                    required: value => !!value || 'Required.',
+                    min: v => v.length >= 8 || 'Min 8 characters',
+                }
             }
         },
         beforeCreate() {
@@ -407,6 +415,7 @@
                 clearInterval(this.interval)
                 this.updateFriendRequests()
                 this.getFriendChannels()
+                //this.getGroupChannels()
                 this.interval = setInterval(() => {
                     var route = this.$router.currentRoute.value.name;
                     if (route == 'login' || route == 'register') {
@@ -415,6 +424,7 @@
                     }
                     this.updateFriendRequests()
                     this.getFriendChannels()
+                    //this.getGroupChannels()
 
                    
 
@@ -478,14 +488,38 @@
                             }
                         })
                     },
-                    JoinGroup() {
+                    commitGroup(action) {
                         if (!this.$store.state.isAuthenticated) {
                             return
                         }
 
                         const formData = {
-                            name: this.request_group_name
+                            name: this.request_group_name,
+                            password: this.request_group_password,
+                            action: action
                         }
+
+
+                        this.axios.post("/api/v1/channel/group/", formData).then(response => {
+                            this.groupErrors = []
+                            this.addGroupDialog = false
+                            this.request_group_name = ''
+                            this.request_group_password = ''
+                        }).catch(error => {
+                            this.groupErrors = []
+                            if (error.response) {
+                                for (const property in error.response.data) {
+                                    this.groupErrors.push(
+                                    `${property}: ${error.response.data[property]}`);
+                                }
+
+                                console.log(JSON.stringify(error.response.data));
+                            } else {
+                                this.groupErrors.push("Something went wrong. Please try again.");
+
+                                console.log(JSON.stringify(error));
+                            }
+                        })
                     },
                     async updateFriendRequests() {
                             this.axios.get("/api/v1/request/latest/")
@@ -584,18 +618,23 @@
                                     })
                                 },
                                 async getFriendChannels() {
-                                        this.axios.get("/api/v1/channel/").then(response => {
-                                            this.friend_channels = response.data
-                                        })
-                                    },
-                                    setChannelId(channel_id, channel_name = null) {
-                                        this.$store.commit("setSelectedChannelId", channel_id)
-                                        localStorage.selectedChannelId = channel_id
-                                        if (channel_name != null) {
-                                            this.$store.commit("setSelectedChannelName", channel_name)
-                                            localStorage.selectedChannelName = channel_name
-                                        }
-                                    },
+                                    this.axios.get("/api/v1/channel/").then(response => {
+                                        this.friend_channels = response.data
+                                    })
+                                },
+                                async getGroupChannels() {
+                                    this.axios.get("/api/v1/channel/group/").then(response => {
+                                        this.group_channels = response.data
+                                    })
+                                },
+                                setChannelId(channel_id, channel_name = null) {
+                                    this.$store.commit("setSelectedChannelId", channel_id)
+                                    localStorage.selectedChannelId = channel_id
+                                    if (channel_name != null) {
+                                        this.$store.commit("setSelectedChannelName", channel_name)
+                                        localStorage.selectedChannelName = channel_name
+                                    }
+                                },
 
                 }
             }
@@ -629,6 +668,7 @@
     .sidebar-groups {
         background-color: #424242;
         width: fit-content;
+        min-width: 90px;
         height: 100%;
         overflow-y: auto;
         overflow-x: hidden;
@@ -643,8 +683,10 @@
         overflow-x: hidden;
     }
 
+
     .section {
         margin-left: 300px;
+        height: 100vh !important;
     }
 
     .myaccount-container {

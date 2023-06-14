@@ -6,7 +6,7 @@
 
 
                 <v-text-field v-model="password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" :counter="10"
+                    :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" :counter="20"
                     hint="At least 8 characters" @click:append="show1 = !show1" label="password" required>
                 </v-text-field>
 
