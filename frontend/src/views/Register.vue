@@ -3,17 +3,17 @@
         <v-card width="400" height="360" title="Register" subtitle="If you already have an account go to login"
             class="pa-2">
             <form @submit.prevent="submitForm">
-                <v-text-field v-model="username" :counter="10" label="username" required></v-text-field>
+                <v-text-field v-model="username" :counter="25" label="username" required></v-text-field>
 
 
                 <v-text-field v-model="password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" :counter="10"
+                    :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" :counter="20"
                     hint="At least 8 characters" @click:append="show1 = !show1" label="password" required>
                 </v-text-field>
 
 
                 <v-text-field v-model="password2" :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="[rules.required, rules.min, rules.matchingPasswords]" :type="show2 ? 'text' : 'password'"
+                    :rules="[rules.required, rules.min, rules.matchingPasswords]" :type="show2 ? 'text' : 'password'" :counter="20"
                     label="repeat password" hint="At least 8 characters" class="input-group--focused"
                     @click:append="show2 = !show2" required>
                 </v-text-field>

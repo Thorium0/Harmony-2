@@ -2,11 +2,11 @@
     <div class="form-card align-center justify-center d-flex ml-1 mr-1">
         <v-card width="400" height="280" title="Login" subtitle="If you are new go to register" class="pa-2">
             <form @submit.prevent="submitForm">
-                <v-text-field v-model="username" :counter="10" label="username" required></v-text-field>
+                <v-text-field v-model="username" :counter="25" label="username" required></v-text-field>
 
 
                 <v-text-field v-model="password" :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                    :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" :counter="10"
+                    :rules="[rules.required, rules.min]" :type="show1 ? 'text' : 'password'" :counter="20"
                     hint="At least 8 characters" @click:append="show1 = !show1" label="password" required>
                 </v-text-field>
 

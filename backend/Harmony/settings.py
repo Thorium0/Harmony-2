@@ -58,6 +58,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8080'
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -96,8 +97,13 @@ WSGI_APPLICATION = 'Harmony.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+          'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'harmony',
+        'USER': environ.get("DB_USERNAME"),
+        'PASSWORD': environ.get("DB_PASSWORD"),
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+        'OPTIONS': {'charset': 'utf8mb4'}
     }
 }
 

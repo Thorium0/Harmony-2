@@ -26,11 +26,14 @@
 
   <v-form @submit.prevent="sendMessage" class="message-container">
     <div class="d-flex ustify-space-around">
-
+      
+      
       <v-text-field v-model="message" class="pl-2 pr-2" variant="solo-filled" rounded label="Type message here"
         style="width: calc(100% - 138px)">
-
+        <EmojiPicker class="emoji-picker" :native="true" theme="dark" pickerType="input" @select="onSelectEmoji" />
       </v-text-field>
+
+      
 
 
       <v-btn icon="mdi-send" type="submit">
@@ -43,7 +46,10 @@
 </template>
 
 <script>
-import { CometChat } from '@cometchat-pro/chat';
+
+import EmojiPicker from 'vue3-emoji-picker'
+
+import 'vue3-emoji-picker/css'
 
   export default {
     name: 'ChatView',
@@ -57,9 +63,14 @@ import { CometChat } from '@cometchat-pro/chat';
         username: localStorage.username,
       }
     },
-    components: {},
-    created() {
-  
+    components: {
+      EmojiPicker
+    },
+    updated() {
+      var element = document.getElementsByClassName("v3-emoji-picker-input")[0];
+      if (element) {
+        element.remove();
+      }
     },
     mounted() {
       document.title = this.chatTitle
@@ -78,6 +89,9 @@ import { CometChat } from '@cometchat-pro/chat';
       this.getMessagesForChannel()
     },
     methods: {
+      onSelectEmoji(emoji) {
+        this.message += emoji.i
+      },
       call() {
         this.$router.push('/call/null')
       },
@@ -150,6 +164,8 @@ import { CometChat } from '@cometchat-pro/chat';
 </script>
 
 <style scoped>
+
+
   .chat-container {
     height: calc(100vh - 110px);
     overflow-y: auto;
@@ -179,6 +195,12 @@ import { CometChat } from '@cometchat-pro/chat';
     color: #BDBDBD;
     position: absolute;
     right: 0
+  }
+
+  .emoji-picker {
+    position: absolute;
+    right: 0;
+    top: 15px;
   }
 
   .message-text {
