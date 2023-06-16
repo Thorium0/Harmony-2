@@ -12,6 +12,7 @@ Libraries used:
 - corsheaders
 - djoser
 - CometChat
+- vue3-emoji-picker
 
 Requirements:
 - Installs
@@ -21,5 +22,5 @@ Requirements:
 - Library install commands
   - pip install -r requirements.txt
   - npm install -g @vue/cli
-  - npm install yarn vuetify@3.3.0
+  - npm install yarn vuetify@3.3.0 vue3-emoji-picker @cometchat-pro/chat
   - cd frontend && npm install
