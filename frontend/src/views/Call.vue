@@ -1,10 +1,10 @@
 <template>
     <v-card v-if="waiting">
-     <v-card-title>Calling {{ receiver_id }}...</v-card-title>
+        <v-card-title>Calling {{ receiver_id }}...</v-card-title>
     </v-card>
-   
+
     <div id="callScreen"></div>
-   
+
 </template>
 
 <script>
@@ -35,30 +35,29 @@
             } else {
                 if (localStorage.ongoingCall) {
                     this.endCall();
-                } 
+                }
                 setTimeout(() => {
                     if (this.$route.path.split("/")[1] == "call") {
                         this.startVideoChat();
-                        this.listen();
+                        
                     }
                 }, 1000);
-                
+
             }
 
 
         },
-        updated() {
-        },
+        updated() {},
         methods: {
             lowercaseify(string) {
                 for (var i = 0; i < string.length; i++) {
                     if (string[i] == string[i].toUpperCase()) {
-                        string = string.replace(string[i], "_"+string[i].toLowerCase());
+                        string = string.replace(string[i], "_" + string[i].toLowerCase());
                     }
                 }
                 return string
             },
-            
+
             endCall() {
 
                 CometChat.endCall(localStorage.session_id).then(
@@ -103,7 +102,7 @@
                                     localStorage.session_id = null;
                                     CometChat.removeCallListener(call.sessionId);
                                     /* hiding/closing the call screen can be done here. */
-                                    globalContext.$router.go(-1);
+                                    window.location.replace(window.origin+"/chat/"+localStorage.selectedChannelId);
                                 }
                             })
                         );
@@ -130,23 +129,93 @@
             startVideoChat() {
                 if (!this.receiver_id) this.error = true;
                 this.$store.commit("setIsLoading", true);
-                var receiverID = this.lowercaseify(this.receiver_id);
-                var callType = CometChat.CALL_TYPE.VIDEO;
-                var receiverType = CometChat.RECEIVER_TYPE.USER;
-                var call = new CometChat.Call(receiverID, callType, receiverType);
+                var globalContext = this;
+                if (this.receiver_id[0] == "$") {
+                    this.waiting = false;
+                    console.log(this.waiting)
+                    var sessionID = this.lowercaseify(this.receiver_id.substring(1));
 
-                CometChat.initiateCall(call).then(
-                    outGoingCall => {
-                        this.$store.commit("setIsLoading", false);
-                        localStorage.session_id = outGoingCall.sessionId;
-                        history.pushState({}, null, outGoingCall.sessionId);
-                        console.log("Call initiated successfully:", outGoingCall);
-                        // perform action on success. Like show your calling screen.
-                    },
-                    error => {
-                        console.log("Call initialization failed with exception:", error);
-                    }
-                );
+                    let audioOnly = false;
+                    let defaultLayout = true;
+                    localStorage.session_id = sessionID;
+                    localStorage.ongoingCall = true
+                    history.pushState({}, null, sessionID);
+
+                    let callSettings = new CometChat.CallSettingsBuilder()
+                        .enableDefaultLayout(defaultLayout)
+                        .setSessionID(sessionID)
+                        .setIsAudioOnlyCall(audioOnly)
+                        .build();
+
+
+                    CometChat.startCall(
+                        callSettings,
+                        document.getElementById("callScreen"),
+                        new CometChat.OngoingCallListener({
+                            onUserListUpdated: userList => {
+                                console.log("user list:", userList);
+                            },
+                            onCallEnded: call => {
+                                console.log("Call ended:", call);
+                                localStorage.ongoingCall = false;
+                                localStorage.session_id = null;
+                                console.log("eyo")
+                                window.location.replace(window.origin+"/chat/"+localStorage.selectedChannelId);
+                            },
+                            onError: error => {
+                                console.log("Error :", error);
+                            },
+                            onMediaDeviceListUpdated: deviceList => {
+                                console.log("Device List:", deviceList);
+                            },
+                            onUserMuted: (userMuted, userMutedBy) => {
+                                // This event will work in JS SDK v3.0.2-beta1 & later.
+                                console.log("Listener => onUserMuted:", userMuted, userMutedBy);
+                            },
+                            onScreenShareStarted: () => {
+                                // This event will work in JS SDK v3.0.3 & later.
+                                console.log("Screen sharing started.");
+                            },
+                            onScreenShareStopped: () => {
+                                // This event will work in JS SDK v3.0.3 & later.
+                                console.log("Screen sharing stopped.");
+                            },
+                            onCallSwitchedToVideo: (sessionId, callSwitchInitiatedBy,
+                                callSwitchAcceptedBy) => {
+                                    // This event will work in JS SDK v3.0.8 & later.
+                                    console.log("call switched to video:", {
+                                        sessionId,
+                                        callSwitchInitiatedBy,
+                                        callSwitchAcceptedBy
+                                    });
+                                }
+                        })
+                    );
+
+
+                } else {
+
+                    var receiverID = this.lowercaseify(this.receiver_id);
+                    var callType = CometChat.CALL_TYPE.VIDEO;
+                    var receiverType = CometChat.RECEIVER_TYPE.USER;
+                    var call = new CometChat.Call(receiverID, callType, receiverType);
+
+                    CometChat.initiateCall(call).then(
+                        outGoingCall => {
+                            this.$store.commit("setIsLoading", false);
+                            localStorage.session_id = outGoingCall.sessionId;
+                            history.pushState({}, null, outGoingCall.sessionId);
+                            console.log("Call initiated successfully:", outGoingCall);
+                            // perform action on success. Like show your calling screen.
+                        },
+                        error => {
+                            console.log("Call initialization failed with exception:", error);
+                        }
+                    );
+
+                    this.listen();
+                }
+
             },
             listen() {
                 let globalContext = this;
@@ -182,9 +251,9 @@
                                         console.log("Call ended:", call);
                                         /* hiding/closing the call screen can be done here. */
                                         CometChat.removeCallListener(call.sessionId);
-                                        globalContext.$router.go(-2);
+                                        window.location.replace(window.origin+"/chat/"+localStorage.selectedChannelId);
                                     }
-                                   
+
                                 })
                             );
                             // Outgoing Call Accepted
@@ -194,8 +263,8 @@
                             localStorage.ongoingCall = false;
                             localStorage.session_id = null;
                             // Outgoing Call Rejected
-                            globalContext.$router.go(-2);
-                            
+                            window.location.replace(window.origin+"/chat/"+localStorage.selectedChannelId);
+
                         },
                     })
 
@@ -209,4 +278,10 @@
     #callScreen {
         height: 100%;
     }
+
+    @media only screen and (max-width: 600px) {
+        #callScreen {
+        height: 94%;
+    }
+}
 </style>
