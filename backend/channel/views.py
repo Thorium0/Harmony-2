@@ -83,11 +83,9 @@ class GroupChannels(APIView):
                 continue
             data_group = {}
             group_regex = group.name.split("_")
-            data_group["name"] = group.regex[1]
+            data_group["name"] = group_regex[1]
             data_group["id"] = group.id
             members = User.objects.filter(groups__name=group.name)
-            owner = User.objects.get(id=group_regex[0])
-            data_group["image"] = owner.profile.image.url
             data_group["members"] = []
             for member in members:
                 data_group["members"].append({
@@ -107,8 +105,8 @@ class GroupChannels(APIView):
         password = request.data["password"]
         action = request.data["action"]
         
-        group_key = "$"+str(request.user.id)+"_"+name+"_"+password
-        group = Group.objects.filter(name__regex=f'^\$+_{name}_+')
+        group_key = "$_"+name+"_"+password
+        group = Group.objects.filter(name__regex=f'^\$_{name}_+')
         
         if action == "create":
             if group.exists():

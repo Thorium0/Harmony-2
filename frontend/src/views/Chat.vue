@@ -2,7 +2,7 @@
   <v-card class="navbar">
     <div class="d-flex ustify-space-around">
       <v-btn icon="mdi-menu" @click="toggleShowsidebar"></v-btn>
-    <v-card-title class="white--text">{{ chatTitle }}</v-card-title>
+    <v-card-title class="white--text">{{ chatTitle.replace("$", "") }}</v-card-title>
     <v-btn class="call-btn" icon="mdi-phone" @click="call()"></v-btn>
   </div>
   </v-card>
@@ -55,7 +55,7 @@ import 'vue3-emoji-picker/css'
     name: 'ChatView',
     data() {
       return {
-        imageBaseUrl: "http://thorium.ddns.net:8000",
+        imageBaseUrl: process.env.VUE_APP_AXIOS_URL,
         messages: [],
         chatTitle: "Chat - " + localStorage.selectedChannelName,
         message: "",
@@ -93,6 +93,8 @@ import 'vue3-emoji-picker/css'
         this.message += emoji.i
       },
       call() {
+        this.message = "[USER STARTED CALL]"
+        this.sendMessage()
         this.$router.push('/call/null')
       },
       async getMessagesForChannel() {

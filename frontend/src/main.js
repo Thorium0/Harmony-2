@@ -22,7 +22,8 @@ const vuetify = createVuetify({
     }
 })
 
-axios.defaults.baseURL = 'http://thorium.ddns.net:8000'
+axios.defaults.baseURL = process.env.VUE_APP_AXIOS_URL;
+
 
 const app = createApp(App);
 
