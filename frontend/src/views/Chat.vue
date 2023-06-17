@@ -18,6 +18,8 @@
         <v-card flat tile class="message-card">
           <v-card-text class="timestamp">{{ message.created }}</v-card-text>
           <v-card-text class="message-text">{{ message.content }}</v-card-text>
+          <v-img v-if="message.image" v-bind:src="imageBaseUrl + message.image" height="200px" width="200px"
+            class="rounded ma-1" />
         </v-card>
       </div>
 
@@ -26,9 +28,11 @@
 
   <v-form @submit.prevent="sendMessage" class="message-container">
     <div class="d-flex ustify-space-around">
+
+      <v-file-input accept="image/*" v-model="messageImage" :hide-input="true" class="fileInput" />
       
       
-      <v-text-field v-model="message" class="pl-2 pr-2" variant="solo-filled" rounded label="Type message here"
+      <v-text-field v-model="message" class="pl-2 pr-2 message-text-container" variant="solo-filled" rounded label="Type message here"
         style="width: calc(100% - 138px)">
         <EmojiPicker class="emoji-picker" :native="true" theme="dark" pickerType="input" @select="onSelectEmoji" />
       </v-text-field>
@@ -60,6 +64,7 @@ import 'vue3-emoji-picker/css'
         chatTitle: "Chat - " + localStorage.selectedChannelName,
         message: "",
         lastMessageId: null,
+        messageImage: null,
         username: localStorage.username,
       }
     },
@@ -67,10 +72,12 @@ import 'vue3-emoji-picker/css'
       EmojiPicker
     },
     updated() {
-      var element = document.getElementsByClassName("v3-emoji-picker-input")[0];
-      if (element) {
+      var elements = []
+      elements.push(document.getElementsByClassName("v3-emoji-picker-input")[0])
+      elements.push(document.getElementsByClassName("v-input__control")[0])
+      elements.forEach(element => { 
         element.remove();
-      }
+      });
     },
     mounted() {
       document.title = this.chatTitle
@@ -128,13 +135,24 @@ import 'vue3-emoji-picker/css'
           return
         }
         const message = this.message
-        if (message == null || message == "") {
+        if ((message == null || message == "") && this.messageImage == null) {
           return
         }
-        this.axios.post("/api/v1/channel/messages/" + channel_id, {
-          content: message
+        var formData = new FormData();
+
+        formData.append("content", message)
+
+        if (this.messageImage != null) {
+                    formData.append("image", this.messageImage[0])
+                }
+        const headers = {
+                    'Content-Type': 'multipart/form-data'
+                }
+        this.axios.post("/api/v1/channel/messages/" + channel_id, formData, {
+          headers: headers
         }).then(response => {
           this.message = ""
+          this.messageImage = null
         }).catch(error => {
           this.errors = [];
           if (error.response) {
@@ -165,7 +183,7 @@ import 'vue3-emoji-picker/css'
   }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 
 
   .chat-container {
@@ -188,6 +206,10 @@ import 'vue3-emoji-picker/css'
     bottom: 0;
   }
 
+  .message-text-container {
+    margin-left: 20px
+  }
+
   .navbar {
     background-color: #424242;
     width: 100%;
@@ -198,6 +220,7 @@ import 'vue3-emoji-picker/css'
     position: absolute;
     right: 0
   }
+  
 
   .emoji-picker {
     position: absolute;
@@ -223,4 +246,10 @@ import 'vue3-emoji-picker/css'
     background-color: #424242;
     margin-left: 4px;
   }
+
+  .fileInput {
+    position: absolute;
+    top: 30%;
+  }
 </style>
+
