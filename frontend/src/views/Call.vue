@@ -147,6 +147,8 @@
                         .setIsAudioOnlyCall(audioOnly)
                         .build();
 
+                    this.$store.commit("setIsLoading", false);
+
 
                     CometChat.startCall(
                         callSettings,
@@ -228,6 +230,7 @@
                             console.log("Outgoing call accepted:", call);
                             localStorage.ongoingCall = true;
                             globalContext.waiting = false;
+                            globalContext.$store.commit("setIsLoading", false);
                             CometChat.startCall(
                                 call.sessionId,
                                 document.getElementById("callScreen"),
