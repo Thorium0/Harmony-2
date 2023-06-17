@@ -21,6 +21,7 @@ Requirements:
 
 - Library install commands
   - pip install -r requirements.txt
+  - cd frontend 
   - npm install -g @vue/cli
   - npm install yarn vuetify@3.3.0 vue3-emoji-picker @cometchat-pro/chat
-  - cd frontend && npm install
+  - npm install
