@@ -179,21 +179,34 @@ class Messages(APIView):
 
 
     def post(self, request, channel_id, format=None):
+
         group = Group.objects.filter(id=channel_id)
         if group.exists():
             group = group.first()
             if not request.user in group.user_set.all():
                 return Response({"error": "You are not in this channel"}, status=400)
+        
+            
             data = {
                 "group": group.id,
-                "content": request.data["content"],
                 "sender": request.user.id
             }
 
+            try: data["content"] = request.data["content"]
+            except: 
+                try:
+                    data["image"] = request.FILES["image"]
+                except:
+                    return Response({"error": "You must provide message or/and image"}, status=400)
+            
             try:
                 data["image"] = request.FILES["image"]
             except:
                 pass
+
+           
+
+
 
             serializer = MessageSerializer(data=data)
             if serializer.is_valid():
