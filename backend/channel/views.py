@@ -103,7 +103,8 @@ class GroupChannels(APIView):
 
     def post(self, request, format=None):
         name = request.data["name"]
-        password = request.data["password"]
+        try: password = request.data["password"]
+        except: password = ""
         action = request.data["action"]
         
         group_key = "$_"+name+"_"+password
@@ -136,8 +137,25 @@ class GroupChannels(APIView):
                     return Response({"error": "You are already in this group"}, status=400)
             else:
                 return Response({"error": "Group does not exist"}, status=400)
+        elif action == "leave":
+            if group.exists():
+                group = group.first()
+                if request.user in group.user_set.all():
+                    user_instance = request.user
+                    user_instance.groups.remove(group)
+                    if group.user_set.count() == 0:
+                        group.delete()
+                    return Response({"success":"User left group"}, status=201)
+                else:
+                    return Response({"error": "You are not in this group"}, status=400)
+            else:
+                return Response({"error": "Group does not exist"}, status=400)
+
         else:
             return Response({"error": "Invalid action"}, status=400)
+        
+
+        
     
     
 class Messages(APIView):
