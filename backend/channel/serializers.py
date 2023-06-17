@@ -12,4 +12,5 @@ class MessageSerializer(serializers.ModelSerializer):
                   'group',
                   'created',
                   'updated',
+                  'image'
                   )
