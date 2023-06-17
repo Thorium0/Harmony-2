@@ -27,9 +27,12 @@
 
                                     <v-card-actions>
                                         <v-btn color="green" type="submit">Update</v-btn>
+                                        <v-btn color="secondary" @click="passwordDialog = true">Change Password</v-btn>
                                         <v-btn color="primary" @click="accountDialog = false">Close</v-btn>
-                                        <v-btn color="secondary" @click="logout">Logout</v-btn>
+                                        <v-btn color="red" @click="logout">Logout</v-btn>
+
                                     </v-card-actions>
+
                                 </v-form>
                             </v-card>
                             <v-card width="400" v-if="userErrors.length" class="pa-2 mt-2" color="#555500">
@@ -42,6 +45,39 @@
                         {{ username }}
                         <!--<span class="text-muted">#1234</span>-->
                     </v-card>
+                    <v-dialog v-model="passwordDialog" width="auto">
+                        <v-form @submit.prevent="updatePassword">
+
+                            <v-card class="pa-2">
+                                <template v-slot:title>
+                                    <v-card-title>
+                                        Change Password
+                                    </v-card-title>
+                                </template>
+
+                                <v-text-field v-model="password" :append-icon="showPassword1 ? 'mdi-eye' : 'mdi-eye-off'"
+                                    :rules="[passwordRules.required, passwordRules.min]" :type="showPassword1 ? 'text' : 'password'"
+                                    :counter="20" hint="At least 8 characters" @click:append="showPassword1 = !showPassword1"
+                                    label="password" required>
+                                </v-text-field>
+
+
+                                <v-text-field v-model="password2" :append-icon="showPassword2 ? 'mdi-eye' : 'mdi-eye-off'"
+                                    :rules="[passwordRules.required, passwordRules.min, passwordRules.matchingPasswords]"
+                                    :type="showPassword2 ? 'text' : 'password'" :counter="20" label="repeat password"
+                                    hint="At least 8 characters" class="input-group--focused"
+                                    @click:append="showPassword2 = !showPassword2" required>
+                                </v-text-field>
+
+
+                                <v-card-actions>
+                                    <v-btn color="green" type="submit">Update</v-btn>
+                                    <v-btn color="primary" @click="passwordDialog = false">Close</v-btn>
+
+                                </v-card-actions>
+                            </v-card>
+                        </v-form>
+                    </v-dialog>
                 </div>
 
                 <div class="d-flex ustify-space-around channel-flex-box">
@@ -233,6 +269,7 @@
         data() {
             return {
                 accountDialog: false,
+                passwordDialog: false,
                 addDialog: false,
                 addGroupDialog: false,
                 showSidebar: false,
@@ -255,6 +292,17 @@
                 sidebar_icon: '<',
                 request_group_name: '',
                 request_group_password: '',
+                password: '',
+                password2: '',
+
+                showPassword1: false,
+                showPassword2: false,
+                passwordRules: {
+                    required: value => !!value || 'Required.',
+                    min: v => v.length >= 8 || 'Min 8 characters',
+                    matchingPasswords: v => v === this.password || "Passwords do not match"
+
+                },
 
 
                 groupPassShow: false,
@@ -331,7 +379,7 @@
 
         },
         methods: {
-            
+
             acceptCall() {
                 this.callNoti = false
                 this.$router.push("/call/" + this.session_id)
@@ -446,212 +494,236 @@
 
 
             },
-        
-        
 
-        logout() {
-            this.axios.defaults.headers.common["Authorization"] = ""
 
-            localStorage.removeItem("token");
-            localStorage.removeItem("username");
-            localStorage.removeItem("userid");
 
-            this.$store.commit("removeToken");
+            logout() {
+                this.axios.defaults.headers.common["Authorization"] = ""
 
-            this.accountDialog = false;
+                localStorage.removeItem("token");
+                localStorage.removeItem("username");
+                localStorage.removeItem("userid");
 
-            CometChat.logout().then(
-                success => {
-                    localStorage.CometChatIsLoggedIn = false
-                    console.log("Logout completed successfully");
-                    console.log(success);
-                    this.$router.push("/login");
-                },
-                error => {
-                    //Logout failed with exception
-                    console.log("Logout failed with exception:", {
-                        error
+                this.$store.commit("removeToken");
+
+                this.accountDialog = false;
+
+                CometChat.logout().then(
+                    success => {
+                        localStorage.CometChatIsLoggedIn = false
+                        console.log("Logout completed successfully");
+                        console.log(success);
+                        this.$router.push("/login");
+                    },
+                    error => {
+                        //Logout failed with exception
+                        console.log("Logout failed with exception:", {
+                            error
+                        });
                     });
-                });
 
 
-        },
-        sendFriendRequest() {
+            },
+            sendFriendRequest() {
 
-            if (!this.$store.state.isAuthenticated) {
-                return
-            }
-            const formData = {
-                username: this.request_username
-            }
-            this.axios.post("/api/v1/request/create/", formData).then(response => {
-                this.requestErrors = []
-                this.addDialog = false
-                this.request_username = ''
-            }).catch(error => {
-                this.requestErrors = []
-                if (error.response) {
-                    for (const property in error.response.data) {
-                        this.requestErrors.push(
-                            `${property}: ${error.response.data[property]}`);
-                    }
-
-                    console.log(JSON.stringify(error.response.data));
-                } else {
-                    this.requestErrors.push("Something went wrong. Please try again.");
-
-                    console.log(JSON.stringify(error));
+                if (!this.$store.state.isAuthenticated) {
+                    return
                 }
-            })
-        },
-        commitGroup(action) {
-            if (!this.$store.state.isAuthenticated) {
-                return
-            }
-
-            const formData = {
-                name: this.request_group_name,
-                password: this.request_group_password,
-                action: action
-            }
-
-            this.axios.post("/api/v1/channel/group/", formData).then(response => {
-                this.groupErrors = []
-                this.addGroupDialog = false
-                this.request_group_name = ''
-                this.request_group_password = ''
-            }).catch(error => {
-                this.groupErrors = []
-                if (error.response) {
-                    for (const property in error.response.data) {
-                        this.groupErrors.push(
-                            `${property}: ${error.response.data[property]}`);
-                    }
-
-                    console.log(JSON.stringify(error.response.data));
-                } else {
-                    this.groupErrors.push("Something went wrong. Please try again.");
-
-                    console.log(JSON.stringify(error));
+                const formData = {
+                    username: this.request_username
                 }
-            })
-        },
-        async updateFriendRequests() {
-            this.axios.get("/api/v1/request/latest/")
-                .then(response => {
-                    this.friend_requests = response.data
+                this.axios.post("/api/v1/request/create/", formData).then(response => {
+                    this.requestErrors = []
+                    this.addDialog = false
+                    this.request_username = ''
+                }).catch(error => {
+                    this.requestErrors = []
+                    if (error.response) {
+                        for (const property in error.response.data) {
+                            this.requestErrors.push(
+                                `${property}: ${error.response.data[property]}`);
+                        }
+
+                        console.log(JSON.stringify(error.response.data));
+                    } else {
+                        this.requestErrors.push("Something went wrong. Please try again.");
+
+                        console.log(JSON.stringify(error));
+                    }
                 })
-                .catch(error => {
+            },
+            commitGroup(action) {
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
+                const formData = {
+                    name: this.request_group_name,
+                    password: this.request_group_password,
+                    action: action
+                }
+
+                this.axios.post("/api/v1/channel/group/", formData).then(response => {
+                    this.groupErrors = []
+                    this.addGroupDialog = false
+                    this.request_group_name = ''
+                    this.request_group_password = ''
+                }).catch(error => {
+                    this.groupErrors = []
+                    if (error.response) {
+                        for (const property in error.response.data) {
+                            this.groupErrors.push(
+                                `${property}: ${error.response.data[property]}`);
+                        }
+
+                        console.log(JSON.stringify(error.response.data));
+                    } else {
+                        this.groupErrors.push("Something went wrong. Please try again.");
+
+                        console.log(JSON.stringify(error));
+                    }
+                })
+            },
+            async updateFriendRequests() {
+                this.axios.get("/api/v1/request/latest/")
+                    .then(response => {
+                        this.friend_requests = response.data
+                    })
+                    .catch(error => {
+                        console.log(JSON.stringify(error))
+                    })
+            },
+            isMobile() {
+                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator
+                    .userAgent)
+            },
+            async acceptFriendRequest(requestId) {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
+                const formData = {
+                    id: requestId,
+                    status: "A"
+                }
+
+                this.axios.post("/api/v1/request/set/", formData).then(response => {
+                    this.updateFriendRequests()
+                    this.getFriendChannels()
+                })
+            },
+            async rejectFriendRequest(requestId) {
+
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
+                const formData = {
+                    id: requestId,
+                    status: "R"
+                }
+
+                this.axios.post("/api/v1/request/set/", formData).then(response => {
+                    this.updateFriendRequests()
+                })
+            },
+            updateProfile() {
+
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
+                var formData = new FormData()
+
+                if (this.update_username.length > 1) {
+                    formData.append("username", this.update_username)
+                }
+                if (this.update_profile_picture != null) {
+                    formData.append("image", this.update_profile_picture[0])
+                }
+
+
+
+                const headers = {
+                    'Content-Type': 'multipart/form-data'
+                }
+
+                this.axios.put("/api/v1/profile/", formData, {
+                    headers: headers
+                }).then(response => {
+                    this.userErrors = []
+
+                    if (response.data.user) {
+                        localStorage.username = response.data.user.username
+                    }
+                    this.update_username = ""
+                    this.update_profile_picture = null
+                    this.accountDialog = false
+                }).catch(error => {
+                    this.userErrors = []
+                    this.update_profile_picture = null
+                    if (error.response) {
+                        for (const property in error.response.data) {
+                            this.userErrors.push(
+                                `${property}: ${error.response.data[property]}`);
+                        }
+
+                        console.log(JSON.stringify(error.response.data));
+                    } else {
+                        this.userErrors.push(
+                            "error: Make sure you have filled out the fields correctly."
+                        );
+
+                        console.log(JSON.stringify(error));
+                    }
+                })
+            },
+            async getFriendChannels() {
+                this.axios.get("/api/v1/channel/").then(response => {
+                    this.friend_channels = response.data
+                })
+            },
+            async getGroupChannels() {
+                this.axios.get("/api/v1/channel/group/").then(response => {
+                    this.group_channels = response.data
+                })
+            },
+            setChannelId(channel_id, channel_name = null) {
+                this.$store.commit("setSelectedChannelId", channel_id)
+                localStorage.selectedChannelId = channel_id
+                if (channel_name != null) {
+                    this.$store.commit("setSelectedChannelName", channel_name)
+                    localStorage.selectedChannelName = channel_name
+                }
+            },
+            updatePassword() {
+                if(!this.$store.state.isAuthenticated || this.password != this.password2) {
+                    return
+                }
+
+                const formData = {
+                    password: this.password,
+                }
+
+                const headers = {
+                    'Content-Type': 'multipart/form-data'
+                }
+
+                this.axios.put("/api/v1/profile/", formData, {headers: headers}).then(response => {
+                    this.passwordDialog = false;
+                    this.password = "";
+                    this.showPassword1 = false;
+                    this.showPassword2 = false;
+                    this.password2 = "";
+                }).catch(error => {
                     console.log(JSON.stringify(error))
                 })
-        },
-        isMobile() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator
-                .userAgent)
-        },
-        async acceptFriendRequest(requestId) {
 
-            if (!this.$store.state.isAuthenticated) {
-                return
             }
 
-            const formData = {
-                id: requestId,
-                status: "A"
-            }
-
-            this.axios.post("/api/v1/request/set/", formData).then(response => {
-                this.updateFriendRequests()
-                this.getFriendChannels()
-            })
-        },
-        async rejectFriendRequest(requestId) {
-
-
-            if (!this.$store.state.isAuthenticated) {
-                return
-            }
-
-            const formData = {
-                id: requestId,
-                status: "R"
-            }
-
-            this.axios.post("/api/v1/request/set/", formData).then(response => {
-                this.updateFriendRequests()
-            })
-        },
-        updateProfile() {
-
-            if (!this.$store.state.isAuthenticated) {
-                return
-            }
-
-            var formData = new FormData()
-
-            if (this.update_username.length > 1) {
-                formData.append("username", this.update_username)
-            }
-            if (this.update_profile_picture != null) {
-                formData.append("image", this.update_profile_picture[0])
-            }
-
-
-
-            const headers = {
-                'Content-Type': 'multipart/form-data'
-            }
-
-            this.axios.put("/api/v1/profile/", formData, {
-                headers: headers
-            }).then(response => {
-                this.userErrors = []
-
-                if (response.data.user) {
-                    localStorage.username = response.data.user.username
-                }
-                this.update_username = ""
-                this.update_profile_picture = null
-                this.accountDialog = false
-            }).catch(error => {
-                this.userErrors = []
-                this.update_profile_picture = null
-                if (error.response) {
-                    for (const property in error.response.data) {
-                        this.userErrors.push(
-                            `${property}: ${error.response.data[property]}`);
-                    }
-
-                    console.log(JSON.stringify(error.response.data));
-                } else {
-                    this.userErrors.push(
-                        "error: Make sure you have filled out the fields correctly."
-                    );
-
-                    console.log(JSON.stringify(error));
-                }
-            })
-        },
-        async getFriendChannels() {
-            this.axios.get("/api/v1/channel/").then(response => {
-                this.friend_channels = response.data
-            })
-        },
-        async getGroupChannels() {
-            this.axios.get("/api/v1/channel/group/").then(response => {
-                this.group_channels = response.data
-            })
-        },
-        setChannelId(channel_id, channel_name = null) {
-            this.$store.commit("setSelectedChannelId", channel_id)
-            localStorage.selectedChannelId = channel_id
-            if (channel_name != null) {
-                this.$store.commit("setSelectedChannelName", channel_name)
-                localStorage.selectedChannelName = channel_name
-            }
-        },
-
-    }
+        }
     }
 </script>
 
@@ -718,9 +790,7 @@
         width: 100%;
     }
 
-    .myaccount-card {
-        
-    }
+    .myaccount-card {}
 
     .channel-flex-box {
         height: 100%;

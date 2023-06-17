@@ -23,12 +23,24 @@ class UserProfile(APIView):
             data["image"] = request.FILES["image"]
         except:
             pass
+
+        
             
 
 
         serializer = ProfileSerializer(data=data, partial=True)
         if serializer.is_valid():
             serializer.update(request, data)
-            return Response(serializer.data, status=201)
+
+            try: data["password"] = request.POST["password"]
+            except: pass
+            else:
+                try:
+                    request.user.set_password(data["password"])
+                    request.user.save()
+                except: 
+                    return Response({"error": "Failed to set password"}, status=400)
+
+            return Response({"success": "user information updated"}, status=201)
         else:
             return Response({"error": "A user already has this username"}, status=400)
