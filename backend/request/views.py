@@ -16,7 +16,21 @@ class FriendRequests(APIView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request, format=None):
+    def get(self, request, username=None, format=None):
+        if username != None:
+            fromUser = User.objects.get(username=username)
+            try: request = FriendRequest.objects.get(fromUser=fromUser, toUser=request.user.id)
+            except:
+                try: request = FriendRequest.objects.get(toUser=fromUser, fromUser=request.user.id)
+                except:  Response({"error": "Request not found"}, status=400)
+            try: request = FriendRequest.objects.get(toUser=fromUser, fromUser=request.user.id)
+            except: pass
+
+            data = {
+                "id": request.id,
+            }
+            return Response(data, status=201)
+        
         requests = FriendRequest.objects.filter(toUser=request.user.id, status="P")
  
         data = []

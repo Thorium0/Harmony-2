@@ -73,8 +73,8 @@
                             <v-card width="400" title="Create/Join group"
                                 subtitle="Enter group name and password to create or join group" class="pa-2">
                                 <v-form @submit.prevent="">
-                                    <v-text-field v-model="request_group_name" :counter="10"
-                                        label="Group name" required>
+                                    <v-text-field v-model="request_group_name" :counter="10" label="Group name"
+                                        required>
                                     </v-text-field>
 
                                     <v-text-field v-model="request_group_password"
@@ -327,7 +327,11 @@
         computed: {
 
         },
+        components: {
+
+        },
         methods: {
+            
             acceptCall() {
                 this.callNoti = false
                 this.$router.push("/call/" + this.session_id)
@@ -442,210 +446,212 @@
 
 
             },
+        
+        
 
-            logout() {
-                this.axios.defaults.headers.common["Authorization"] = ""
+        logout() {
+            this.axios.defaults.headers.common["Authorization"] = ""
 
-                localStorage.removeItem("token");
-                localStorage.removeItem("username");
-                localStorage.removeItem("userid");
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            localStorage.removeItem("userid");
 
-                this.$store.commit("removeToken");
+            this.$store.commit("removeToken");
 
-                this.accountDialog = false;
+            this.accountDialog = false;
 
-                CometChat.logout().then(
-                    success => {
-                        localStorage.CometChatIsLoggedIn = false
-                        console.log("Logout completed successfully");
-                        console.log(success);
-                        this.$router.push("/login");
-                    },
-                    error => {
-                        //Logout failed with exception
-                        console.log("Logout failed with exception:", {
-                            error
-                        });
+            CometChat.logout().then(
+                success => {
+                    localStorage.CometChatIsLoggedIn = false
+                    console.log("Logout completed successfully");
+                    console.log(success);
+                    this.$router.push("/login");
+                },
+                error => {
+                    //Logout failed with exception
+                    console.log("Logout failed with exception:", {
+                        error
                     });
+                });
 
 
-            },
-            sendFriendRequest() {
+        },
+        sendFriendRequest() {
 
-                if (!this.$store.state.isAuthenticated) {
-                    return
-                }
-                const formData = {
-                    username: this.request_username
-                }
-                this.axios.post("/api/v1/request/create/", formData).then(response => {
-                    this.requestErrors = []
-                    this.addDialog = false
-                    this.request_username = ''
-                }).catch(error => {
-                    this.requestErrors = []
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.requestErrors.push(
-                                `${property}: ${error.response.data[property]}`);
-                        }
-
-                        console.log(JSON.stringify(error.response.data));
-                    } else {
-                        this.requestErrors.push("Something went wrong. Please try again.");
-
-                        console.log(JSON.stringify(error));
+            if (!this.$store.state.isAuthenticated) {
+                return
+            }
+            const formData = {
+                username: this.request_username
+            }
+            this.axios.post("/api/v1/request/create/", formData).then(response => {
+                this.requestErrors = []
+                this.addDialog = false
+                this.request_username = ''
+            }).catch(error => {
+                this.requestErrors = []
+                if (error.response) {
+                    for (const property in error.response.data) {
+                        this.requestErrors.push(
+                            `${property}: ${error.response.data[property]}`);
                     }
-                })
-            },
-            commitGroup(action) {
-                if (!this.$store.state.isAuthenticated) {
-                    return
+
+                    console.log(JSON.stringify(error.response.data));
+                } else {
+                    this.requestErrors.push("Something went wrong. Please try again.");
+
+                    console.log(JSON.stringify(error));
                 }
+            })
+        },
+        commitGroup(action) {
+            if (!this.$store.state.isAuthenticated) {
+                return
+            }
 
-                const formData = {
-                    name: this.request_group_name,
-                    password: this.request_group_password,
-                    action: action
-                }
+            const formData = {
+                name: this.request_group_name,
+                password: this.request_group_password,
+                action: action
+            }
 
-                this.axios.post("/api/v1/channel/group/", formData).then(response => {
-                    this.groupErrors = []
-                    this.addGroupDialog = false
-                    this.request_group_name = ''
-                    this.request_group_password = ''
-                }).catch(error => {
-                    this.groupErrors = []
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.groupErrors.push(
-                                `${property}: ${error.response.data[property]}`);
-                        }
-
-                        console.log(JSON.stringify(error.response.data));
-                    } else {
-                        this.groupErrors.push("Something went wrong. Please try again.");
-
-                        console.log(JSON.stringify(error));
+            this.axios.post("/api/v1/channel/group/", formData).then(response => {
+                this.groupErrors = []
+                this.addGroupDialog = false
+                this.request_group_name = ''
+                this.request_group_password = ''
+            }).catch(error => {
+                this.groupErrors = []
+                if (error.response) {
+                    for (const property in error.response.data) {
+                        this.groupErrors.push(
+                            `${property}: ${error.response.data[property]}`);
                     }
+
+                    console.log(JSON.stringify(error.response.data));
+                } else {
+                    this.groupErrors.push("Something went wrong. Please try again.");
+
+                    console.log(JSON.stringify(error));
+                }
+            })
+        },
+        async updateFriendRequests() {
+            this.axios.get("/api/v1/request/latest/")
+                .then(response => {
+                    this.friend_requests = response.data
                 })
-            },
-            async updateFriendRequests() {
-                this.axios.get("/api/v1/request/latest/")
-                    .then(response => {
-                        this.friend_requests = response.data
-                    })
-                    .catch(error => {
-                        console.log(JSON.stringify(error))
-                    })
-            },
-            isMobile() {
-                return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator
-                    .userAgent)
-            },
-            async acceptFriendRequest(requestId) {
-
-                if (!this.$store.state.isAuthenticated) {
-                    return
-                }
-
-                const formData = {
-                    id: requestId,
-                    status: "A"
-                }
-
-                this.axios.post("/api/v1/request/set/", formData).then(response => {
-                    this.updateFriendRequests()
-                    this.getFriendChannels()
+                .catch(error => {
+                    console.log(JSON.stringify(error))
                 })
-            },
-            async rejectFriendRequest(requestId) {
+        },
+        isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator
+                .userAgent)
+        },
+        async acceptFriendRequest(requestId) {
+
+            if (!this.$store.state.isAuthenticated) {
+                return
+            }
+
+            const formData = {
+                id: requestId,
+                status: "A"
+            }
+
+            this.axios.post("/api/v1/request/set/", formData).then(response => {
+                this.updateFriendRequests()
+                this.getFriendChannels()
+            })
+        },
+        async rejectFriendRequest(requestId) {
 
 
-                if (!this.$store.state.isAuthenticated) {
-                    return
+            if (!this.$store.state.isAuthenticated) {
+                return
+            }
+
+            const formData = {
+                id: requestId,
+                status: "R"
+            }
+
+            this.axios.post("/api/v1/request/set/", formData).then(response => {
+                this.updateFriendRequests()
+            })
+        },
+        updateProfile() {
+
+            if (!this.$store.state.isAuthenticated) {
+                return
+            }
+
+            var formData = new FormData()
+
+            if (this.update_username.length > 1) {
+                formData.append("username", this.update_username)
+            }
+            if (this.update_profile_picture != null) {
+                formData.append("image", this.update_profile_picture[0])
+            }
+
+
+
+            const headers = {
+                'Content-Type': 'multipart/form-data'
+            }
+
+            this.axios.put("/api/v1/profile/", formData, {
+                headers: headers
+            }).then(response => {
+                this.userErrors = []
+
+                if (response.data.user) {
+                    localStorage.username = response.data.user.username
                 }
-
-                const formData = {
-                    id: requestId,
-                    status: "R"
-                }
-
-                this.axios.post("/api/v1/request/set/", formData).then(response => {
-                    this.updateFriendRequests()
-                })
-            },
-            updateProfile() {
-
-                if (!this.$store.state.isAuthenticated) {
-                    return
-                }
-
-                var formData = new FormData()
-
-                if (this.update_username.length > 1) {
-                    formData.append("username", this.update_username)
-                }
-                if (this.update_profile_picture != null) {
-                    formData.append("image", this.update_profile_picture[0])
-                }
-
-
-
-                const headers = {
-                    'Content-Type': 'multipart/form-data'
-                }
-
-                this.axios.put("/api/v1/profile/", formData, {
-                    headers: headers
-                }).then(response => {
-                    this.userErrors = []
-
-                    if (response.data.user) {
-                        localStorage.username = response.data.user.username
-                    }
-                    this.update_username = ""
-                    this.update_profile_picture = null
-                    this.accountDialog = false
-                }).catch(error => {
-                    this.userErrors = []
-                    this.update_profile_picture = null
-                    if (error.response) {
-                        for (const property in error.response.data) {
-                            this.userErrors.push(
-                                `${property}: ${error.response.data[property]}`);
-                        }
-
-                        console.log(JSON.stringify(error.response.data));
-                    } else {
+                this.update_username = ""
+                this.update_profile_picture = null
+                this.accountDialog = false
+            }).catch(error => {
+                this.userErrors = []
+                this.update_profile_picture = null
+                if (error.response) {
+                    for (const property in error.response.data) {
                         this.userErrors.push(
-                            "error: Make sure you have filled out the fields correctly."
-                        );
-
-                        console.log(JSON.stringify(error));
+                            `${property}: ${error.response.data[property]}`);
                     }
-                })
-            },
-            async getFriendChannels() {
-                this.axios.get("/api/v1/channel/").then(response => {
-                    this.friend_channels = response.data
-                })
-            },
-            async getGroupChannels() {
-                this.axios.get("/api/v1/channel/group/").then(response => {
-                    this.group_channels = response.data
-                })
-            },
-            setChannelId(channel_id, channel_name = null) {
-                this.$store.commit("setSelectedChannelId", channel_id)
-                localStorage.selectedChannelId = channel_id
-                if (channel_name != null) {
-                    this.$store.commit("setSelectedChannelName", channel_name)
-                    localStorage.selectedChannelName = channel_name
-                }
-            },
 
-        }
+                    console.log(JSON.stringify(error.response.data));
+                } else {
+                    this.userErrors.push(
+                        "error: Make sure you have filled out the fields correctly."
+                    );
+
+                    console.log(JSON.stringify(error));
+                }
+            })
+        },
+        async getFriendChannels() {
+            this.axios.get("/api/v1/channel/").then(response => {
+                this.friend_channels = response.data
+            })
+        },
+        async getGroupChannels() {
+            this.axios.get("/api/v1/channel/group/").then(response => {
+                this.group_channels = response.data
+            })
+        },
+        setChannelId(channel_id, channel_name = null) {
+            this.$store.commit("setSelectedChannelId", channel_id)
+            localStorage.selectedChannelId = channel_id
+            if (channel_name != null) {
+                this.$store.commit("setSelectedChannelName", channel_name)
+                localStorage.selectedChannelName = channel_name
+            }
+        },
+
+    }
     }
 </script>
 
