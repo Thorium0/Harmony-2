@@ -3,7 +3,7 @@
         <v-layout>
             <v-navigation-drawer :touchless="true" permanent width="300" v-model="showSidebar" class="sidebar">
                 <div class="myaccount-container">
-                    <v-card>
+                    <v-card class="rounded-0 myaccount-card">
                         <v-dialog v-model="accountDialog" width="auto">
                             <template v-slot:activator="{ props }">
                                 <v-btn density="compact" icon="mdi-cog" color="grey" v-bind="props"></v-btn>
@@ -716,6 +716,10 @@
 
     .myaccount-container {
         width: 100%;
+    }
+
+    .myaccount-card {
+        
     }
 
     .channel-flex-box {
