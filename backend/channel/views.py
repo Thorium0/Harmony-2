@@ -3,6 +3,7 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
+from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth.models import User, Group
 from datetime import datetime
 
@@ -142,6 +143,7 @@ class GroupChannels(APIView):
 class Messages(APIView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
+    parser_classes = (MultiPartParser, FormParser,)
 
 
     def get(self, request, channel_id, format=None):
@@ -185,6 +187,12 @@ class Messages(APIView):
                 "content": request.data["content"],
                 "sender": request.user.id
             }
+
+            try:
+                data["image"] = request.FILES["image"]
+            except:
+                pass
+
             serializer = MessageSerializer(data=data)
             if serializer.is_valid():
                 serializer.save()
