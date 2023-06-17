@@ -59,18 +59,19 @@
 
         },
         methods: {
-            submitForm() {
+            async submitForm() {
 
 
                 const formData = {
                     username: this.username,
                     password: this.password
                 }
+                    
 
                 this.axios.post("/api/v1/users/", formData)
                     .then(response => {
                         this.errors = [];
-                        this.CreateCometChatUser()
+                        this.CreateCometChatUser(response.data.id)
                         this.$router.push("/login");
                     }).catch(error => {
                         this.errors = [];
@@ -85,11 +86,14 @@
 
                             console.log(JSON.stringify(error));
                         }
-                    })
+                    })     
             },
-            CreateCometChatUser() {
+            CreateCometChatUser(_user_id) {
+                let user_id = _user_id.toString();
+                
                 let authKey = process.env.VUE_APP_COMETCHAT_AUTH_KEY;
-                var uid = this.lowercaseify(this.username);
+                
+                var uid = user_id;
                 var name = this.username;
 
                 var user = new CometChat.User(uid);
