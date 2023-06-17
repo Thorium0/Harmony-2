@@ -159,6 +159,8 @@ class Messages(APIView):
                 dict = {}
                 dict["id"] = message.id
                 dict["content"] = message.content
+                try: dict["image"] = message.image.url
+                except: pass
                 time = message.created
                 if time.date() == datetime.today().date():
                      dict["created"] = time.strftime("Today at %H:%M:%S")
