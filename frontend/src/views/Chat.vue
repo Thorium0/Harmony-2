@@ -1,5 +1,5 @@
 <template>
-    <v-card class="navbar">
+    <v-card class="navbar rounded-0">
         <div class="d-flex ustify-space-around">
             <v-btn icon="mdi-menu" @click="toggleShowsidebar"></v-btn>
 
@@ -263,7 +263,7 @@
     }
 
     .navbar {
-        background-color: #424242;
+        background-color: #616161;
         width: 100%;
     }
 
