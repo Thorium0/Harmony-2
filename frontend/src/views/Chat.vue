@@ -91,17 +91,10 @@
             EmojiPicker
         },
         updated() {
-            var elements = []
-            elements.push(document.getElementsByClassName("v3-emoji-picker-input")[0])
-            elements.push(document.getElementsByClassName("v-input__control")[0])
+           
+            $(".v3-emoji-picker-input").remove();
+            $(".fileInput .v-input__control").remove();
 
-            for (var i = 0; i < elements.length; i++) {
-                if (elements[i] == null) {
-                    continue
-                }
-                elements[i].remove();
-                elements.pop(i);
-            }
         },
         mounted() {
             document.title = this.chatTitle
@@ -147,7 +140,7 @@
                     this.lastMessageId = lastMessageId
 
                 }).catch(error => {
-                    //console.log(JSON.stringify(error))
+                    console.log(JSON.stringify(error))
                 })
 
                 this.$store.commit('setIsLoading', false)
