@@ -20,7 +20,7 @@ Requirements:
   - Install npm >= 8.1.2
 
 - Library install commands
-  - pip install -r requirements.txt
+  - pip install -r backend/requirements.txt
   - npm install -g @vue/cli
   - npm install yarn vuetify@3.3.0 vue3-emoji-picker @cometchat-pro/chat
   - cd frontend && npm install
