@@ -89,7 +89,6 @@ class FriendApprover(APIView):
                 if request.data["status"] == "A":
                     friendRequest.status = "A"
                     
-                    #CreateOrUpdateGroup(friendRequest)
                 elif request.data["status"] == "R":
                     friendRequest.status = "R"
                 else: 
@@ -97,8 +96,22 @@ class FriendApprover(APIView):
                 friendRequest.save()
                 return Response(request.data, status=201)
             elif friendRequest.status == "A":
-                return Response({"error": "You are already friends with this user"}, status=400)
+                if request.data["status"]  == "R":
+                    friendRequest.status = "R"
+                elif request.data["status"]  == "P":
+                    friendRequest.status = "P"
+                else:
+                    return Response({"error": "You are already friends with this user"}, status=400)
+                friendRequest.save()
+                return Response(request.data, status=201)
             else:
-                return Response({"error": "Friend request already rejected"}, status=400)
+                if request.data["status"]  == "A":
+                    friendRequest.status = "A"
+                elif request.data["status"]  == "P":
+                    friendRequest.status = "P"
+                else:
+                    return Response({"error": "Friend request already rejected"}, status=400)
+                friendRequest.save()
+                return Response(request.data, status=201)
             
         
