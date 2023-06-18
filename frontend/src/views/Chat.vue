@@ -52,7 +52,7 @@
 
             <v-text-field v-model="message" class="pl-2 pr-2 message-text-container" variant="solo-filled" rounded
                 label="Type message here" style="width: calc(100% - 138px)">
-                <EmojiPicker class="emoji-picker" :native="true" theme="dark" pickerType="input"
+                <EmojiPicker v-if="!isMobile()" class="emoji-picker" :native="true" theme="dark" pickerType="input"
                     @select="onSelectEmoji" />
             </v-text-field>
 
@@ -233,6 +233,13 @@
                 }
 
             },
+            isMobile() {
+   if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+     return true
+   } else {
+     return false
+   }
+ }
         },
     }
 </script>
@@ -256,6 +263,22 @@
         position: relative;
         width: 100%;
         bottom: 0;
+    }
+
+    @media only screen and (max-width: 600px) {
+        .message-container {
+            position: fixed;
+            height: 70px;
+            z-index: 5;
+        }
+        .chat-container {
+            height: calc(100vh - 130px);
+        }
+
+        .navbar {
+            position: fixed;
+            z-index: 10;
+        }
     }
 
     .message-text-container {
