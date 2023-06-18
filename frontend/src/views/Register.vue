@@ -60,7 +60,12 @@
         },
         methods: {
             async submitForm() {
+                const isAlpha = str => /^[a-zA-Z]*$/.test(str);
 
+                if (!isAlpha(this.username)) {
+                    this.errors.push({"Error" : "Username can only contain letters in the alphabet"});
+                    return;
+                }
 
                 const formData = {
                     username: this.username,
