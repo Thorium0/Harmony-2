@@ -5,6 +5,8 @@ from rest_framework.parsers import MultiPartParser, FormParser
 
 from .serializers import ProfileSerializer
 
+def is_alpha(string):
+    return all(char.isalpha() for char in string)
 
 class UserProfile(APIView):
     permission_classes = (IsAuthenticated,)
@@ -15,9 +17,13 @@ class UserProfile(APIView):
         data = {}
 
         try:
-            data["user"] = {"username": request.POST["username"]}
+            username = request.POST["username"]     
         except:
             pass
+        else: 
+            if not is_alpha(username):
+                return Response({"error": "Username can only contain letters in the alphabet"}, status=400)
+            data["user"] = {"username": username}
 
         try:
             data["image"] = request.FILES["image"]
