@@ -17,12 +17,14 @@ class UserProfile(APIView):
         data = {}
 
         try:
-            username = request.POST["username"]     
+            username = request.POST["username"]
         except:
             pass
         else: 
             if not is_alpha(username):
                 return Response({"error": "Username can only contain letters in the alphabet"}, status=400)
+            if len(username) > 25:
+                return Response({"error": "Username is too long"}, status=400)
             data["user"] = {"username": username}
 
         try:

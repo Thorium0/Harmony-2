@@ -35,8 +35,8 @@ import axios from 'axios';
         name: 'RegisterView',
         data() {
             return {
-                username: 'Bendtsen',
-                password: 'kagemand123',
+                username: '',
+                password: '',
                 errors: [],
 
                 show1: false,

@@ -47,7 +47,9 @@
 
 
         },
-        updated() {},
+        updated() {
+           //$(".bottom-buttons-icon-container").addClass("bottomBtns");
+        },
         methods: {
             lowercaseify(string) {
                 for (var i = 0; i < string.length; i++) {
@@ -285,6 +287,12 @@
     @media only screen and (max-width: 600px) {
         #callScreen {
         height: 94%;
+    }
+
+    .buttomBtns {
+        height: 5vh;
+        width: 5vh;
+        margin-bottom: 2vh;
     }
 }
 </style>

@@ -17,7 +17,7 @@
                                 </template>
                                 <v-form @submit.prevent="updateProfile">
 
-                                    <v-text-field v-model="update_username" :counter="10" label="Change username">
+                                    <v-text-field v-model="update_username" :counter="25" label="Change username">
                                     </v-text-field>
 
 
@@ -45,7 +45,7 @@
                         {{ username }}
                         <!--<span class="text-muted">#1234</span>-->
                     </v-card>
-                    <v-dialog v-model="passwordDialog" width="auto">
+                    <v-dialog v-model="passwordDialog" width="300">
                         <v-form @submit.prevent="updatePassword">
 
                             <v-card class="pa-2">
@@ -88,25 +88,18 @@
                     <div class="sidebar-groups">
 
 
-
-
-
-
-
-
                         <v-btn v-if="group_channels.length" v-for="channel in group_channels" :text="channel.name[0]"
                             @click="setChannelId(channel.id, '$'+channel.name)" :to="'/chat/'+ channel.id" height="80px"
                             width="80px" max-width="80" class="ma-1 large-text rounded-circle">
                         </v-btn>
 
-
-
-
                         <v-dialog v-model="addGroupDialog" width="auto">
                             <template v-slot:activator="{ props }">
 
-                                <v-btn text="+" height="80px" width="80px" max-width="80"
-                                    class="ma-1 large-text rounded-circle" v-bind="props"></v-btn>
+
+    <v-btn text="+" align-center height="80px" width="80px" max-width="80"
+    class="ma-1 large-text rounded-circle" v-bind="props"></v-btn>
+
 
                             </template>
 
@@ -125,9 +118,6 @@
                                         label="password" required>
                                     </v-text-field>
 
-
-
-
                                     <v-card-actions>
                                         <v-btn color="primary" type="submit" @click="commitGroup('join')">Join</v-btn>
                                         <v-btn color="secondary" type="submit" @click="commitGroup('create')">Create
@@ -143,22 +133,12 @@
                             </v-card>
                         </v-dialog>
 
-
-
-
-
-
-
-
-
                     </div>
 
                     <div class="sidebar-friends pa-4">
 
-
-
                         <v-card width="160px" v-if="friend_requests.length" v-for="friend_request in friend_requests"
-                            v-bind:key="friend_request.id" class="mb-2 pr-2" :style="'border: 1px solid yellow;'">
+                            v-bind:key="friend_request.id" class="mb-2 pr-2 center" :style="'border: 1px solid yellow;'">
                             <v-row align="center" class="mt-1 mb-1">
                                 <v-col class="shrink pr-0">
                                     <v-img v-bind:src="imageBaseUrl + friend_request.image" height="50px" width="50px"
@@ -178,7 +158,7 @@
                         </v-card>
 
 
-                        <v-btn height="80px" width="160px" class="mb-2" v-if="friend_channels.length"
+                        <v-btn height="80px" width="160px" class="mb-2 center" v-if="friend_channels.length"
                             v-for="channel in friend_channels" :to="'/chat/'+ channel.id"
                             @click="setChannelId(channel.id, channel.friend.username)">
                             <v-card height="80px" width="160px">
@@ -198,9 +178,10 @@
 
                         <v-dialog v-model="addDialog" width="auto">
                             <template v-slot:activator="{ props }">
-
-                                <v-btn icon="mdi-plus" height="40px" width="150px" class="ma-1 rounded-pill"
+       
+                                <v-btn icon="mdi-plus" height="40px" width="150px" class="ma-1 rounded-pill center"
                                     v-bind="props"></v-btn>
+                                    
 
                             </template>
 
@@ -328,7 +309,7 @@
                 this.axios.defaults.headers.common['Authorization'] = null
             }
 
-            
+
 
 
         },
@@ -642,6 +623,23 @@
                     this.updateFriendRequests()
                 })
             },
+            updateCometChatUser() {
+                let authKey = process.env.VUE_APP_COMETCHAT_AUTH_KEY;
+                let uid = localStorage.user_id;
+                let name = this.update_username;
+
+                var user = new CometChat.User(uid);
+
+                user.setName(name);
+
+                CometChat.updateUser(user, authKey).then(
+                    user => {
+                        console.log("[CometChat] User updated", user);
+                    }, error => {
+                        console.log("[CometChat] Failed to update user", error);
+                    }
+                )
+            },
             async updateProfile() {
 
                 if (!this.$store.state.isAuthenticated) {
@@ -651,7 +649,7 @@
                 var formData = new FormData()
 
                 var headers = {
-                    
+
                 }
 
                 if (this.update_username.length > 1) {
@@ -674,6 +672,7 @@
                     this.accountDialog = false
                     localStorage.username = this.update_username
                     this.username = this.update_username
+                    this.updateCometChatUser()
                     this.update_username = ""
 
                 }).catch(error => {
@@ -776,6 +775,10 @@
         overflow: hidden;
     }
 
+    .center {
+        left: 5%;
+    }
+
 
     .sidebar-groups {
         background-color: #424242;
@@ -792,11 +795,10 @@
         background-color: #616161;
         height: 100%;
         width: auto;
-        min-width: auto;
+        min-width: 210px;
         overflow-y: auto;
         overflow-x: hidden;
     }
-
 
     .section {
         margin-left: 300px;
@@ -806,8 +808,6 @@
     .myaccount-container {
         width: 100%;
     }
-
-    .myaccount-card {}
 
     .channel-flex-box {
         height: 100%;
