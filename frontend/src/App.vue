@@ -55,18 +55,22 @@
                                     </v-card-title>
                                 </template>
 
-                                <v-text-field v-model="password" :append-icon="showPassword1 ? 'mdi-eye' : 'mdi-eye-off'"
-                                    :rules="[passwordRules.required, passwordRules.min]" :type="showPassword1 ? 'text' : 'password'"
-                                    :counter="20" hint="At least 8 characters" @click:append="showPassword1 = !showPassword1"
-                                    label="password" required>
+                                <v-text-field v-model="changePassword"
+                                    :append-icon="showChangePassword1 ? 'mdi-eye' : 'mdi-eye-off'"
+                                    :rules="[changePasswordRules.required, changePasswordRules.min]"
+                                    :type="showChangePassword1 ? 'text' : 'password'" :counter="20"
+                                    hint="At least 8 characters"
+                                    @click:append="showChangePassword1 = !showChangePassword1" label="password"
+                                    required>
                                 </v-text-field>
 
 
-                                <v-text-field v-model="password2" :append-icon="showPassword2 ? 'mdi-eye' : 'mdi-eye-off'"
-                                    :rules="[passwordRules.required, passwordRules.min, passwordRules.matchingPasswords]"
-                                    :type="showPassword2 ? 'text' : 'password'" :counter="20" label="repeat password"
-                                    hint="At least 8 characters" class="input-group--focused"
-                                    @click:append="showPassword2 = !showPassword2" required>
+                                <v-text-field v-model="changePassword2"
+                                    :append-icon="showChangePassword2 ? 'mdi-eye' : 'mdi-eye-off'"
+                                    :rules="[changePasswordRules.required, changePasswordRules.min, changePasswordRules.matchingPasswords]"
+                                    :type="showChangePassword2 ? 'text' : 'password'" :counter="20"
+                                    label="repeat password" hint="At least 8 characters" class="input-group--focused"
+                                    @click:append="showChangePassword2 = !showChangePassword2" required>
                                 </v-text-field>
 
 
@@ -292,15 +296,15 @@
                 sidebar_icon: '<',
                 request_group_name: '',
                 request_group_password: '',
-                password: '',
-                password2: '',
+                changePassword: '',
+                changePassword2: '',
 
-                showPassword1: false,
-                showPassword2: false,
-                passwordRules: {
+                showChangePassword1: false,
+                showChangePassword2: false,
+                changePasswordRules: {
                     required: value => !!value || 'Required.',
                     min: v => v.length >= 8 || 'Min 8 characters',
-                    matchingPasswords: v => v === this.password || "Passwords do not match"
+                    matchingPasswords: v => v === this.changePassword || "Passwords do not match"
 
                 },
 
@@ -324,7 +328,7 @@
                 this.axios.defaults.headers.common['Authorization'] = null
             }
 
-
+            
 
 
         },
@@ -334,14 +338,15 @@
                     this.init()
                 }
                 if (to.name != 'call') {
-                    this.loginCometChat()
-                    this.listenCometChat()
+                    setTimeout(() => {
+                        this.loginCometChat()
+                        this.listenCometChat()
+                    }, 100);
                 }
 
             }
         },
         mounted() {
-
             this.init()
 
 
@@ -356,6 +361,7 @@
 
         },
         beforeUpdate() {
+
             this.username = localStorage.username
 
             var showSidebar = this.$store.state.showSidebar
@@ -415,16 +421,20 @@
 
             loginCometChat() {
 
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
+
                 let apiKey = process.env.VUE_APP_COMETCHAT_API_KEY;
 
                 this.$store.commit('setIsLoading', true)
-                var username = this.lowercaseify(this.username)
+                let uid = localStorage.user_id;
 
-                CometChat.login(username, apiKey).then(
+                CometChat.login(uid, apiKey).then(
                     () => {
                         this.$store.commit('setIsLoading', false)
                         console.log("[CometChat] Login Successful:", {
-                            username: username
+                            username: uid
                         });
                         localStorage.CometChatIsLoggedIn = true
                     },
@@ -438,6 +448,9 @@
             },
 
             listenCometChat() {
+                if (!this.$store.state.isAuthenticated) {
+                    return
+                }
                 let globalContext = this;
                 var listnerID = this.lowercaseify(this.username);
                 CometChat.addCallListener(
@@ -502,7 +515,7 @@
 
                 localStorage.removeItem("token");
                 localStorage.removeItem("username");
-                localStorage.removeItem("userid");
+                localStorage.removeItem("user_id");
 
                 this.$store.commit("removeToken");
 
@@ -629,7 +642,7 @@
                     this.updateFriendRequests()
                 })
             },
-            updateProfile() {
+            async updateProfile() {
 
                 if (!this.$store.state.isAuthenticated) {
                     return
@@ -637,30 +650,32 @@
 
                 var formData = new FormData()
 
+                var headers = {
+                    
+                }
+
                 if (this.update_username.length > 1) {
                     formData.append("username", this.update_username)
+                } else if (this.update_profile_picture == null) {
+                    return
                 }
                 if (this.update_profile_picture != null) {
                     formData.append("image", this.update_profile_picture[0])
+                    headers['Content-Type'] = 'multipart/form-data';
                 }
 
 
-
-                const headers = {
-                    'Content-Type': 'multipart/form-data'
-                }
 
                 this.axios.put("/api/v1/profile/", formData, {
                     headers: headers
                 }).then(response => {
                     this.userErrors = []
-
-                    if (response.data.user) {
-                        localStorage.username = response.data.user.username
-                    }
-                    this.update_username = ""
                     this.update_profile_picture = null
                     this.accountDialog = false
+                    localStorage.username = this.update_username
+                    this.username = this.update_username
+                    this.update_username = ""
+
                 }).catch(error => {
                     this.userErrors = []
                     this.update_profile_picture = null
@@ -699,24 +714,26 @@
                 }
             },
             updatePassword() {
-                if(!this.$store.state.isAuthenticated || this.password != this.password2) {
+                if (!this.$store.state.isAuthenticated || this.changePassword != this.changePassword2) {
                     return
                 }
 
                 const formData = {
-                    password: this.password,
+                    password: this.changePassword,
                 }
 
                 const headers = {
                     'Content-Type': 'multipart/form-data'
                 }
 
-                this.axios.put("/api/v1/profile/", formData, {headers: headers}).then(response => {
+                this.axios.put("/api/v1/profile/", formData, {
+                    headers: headers
+                }).then(response => {
                     this.passwordDialog = false;
-                    this.password = "";
-                    this.showPassword1 = false;
-                    this.showPassword2 = false;
-                    this.password2 = "";
+                    this.changePassword = "";
+                    this.showChangePassword1 = false;
+                    this.showChangePassword2 = false;
+                    this.changePassword2 = "";
                 }).catch(error => {
                     console.log(JSON.stringify(error))
                 })

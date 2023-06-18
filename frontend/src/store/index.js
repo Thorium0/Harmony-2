@@ -20,6 +20,7 @@ export default createStore({
                 state.token = ''
                 state.isAuthenticated = false
                 state.selectedChannelId = null
+                state.selectedChannelName = null
             }
         },
         setIsLoading(state, status) {

@@ -97,7 +97,7 @@
 
         },
         mounted() {
-            document.title = this.chatTitle
+            document.title = this.chatTitle.replace("$", "")
             this.interval = setInterval(() => {
                 var route = this.$router.currentRoute.value.name;
 

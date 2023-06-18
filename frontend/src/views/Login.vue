@@ -71,6 +71,13 @@ import axios from 'axios';
                             localStorage.setItem("token", token);
                             localStorage.setItem("username", this.username);
 
+                            this.axios.get("/api/v1/users"
+                        ).then(response => {
+                            localStorage.user_id=response.data[0].id
+                        }).catch(error => {
+                            console.log(JSON.stringify(error));
+                        })
+
                             const toPath = this.$route.query.to || "/";
             
                             this.$router.push(toPath);
