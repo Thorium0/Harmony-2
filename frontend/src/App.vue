@@ -59,16 +59,17 @@
                                     :append-icon="showChangePassword1 ? 'mdi-eye' : 'mdi-eye-off'"
                                     :rules="[changePasswordRules.required, changePasswordRules.min]"
                                     :type="showChangePassword1 ? 'text' : 'password'" :counter="20"
-                                    hint="At least 8 characters" @click:append="showChangePassword1 = !showChangePassword1"
-                                    label="password" required>
+                                    hint="At least 8 characters"
+                                    @click:append="showChangePassword1 = !showChangePassword1" label="password"
+                                    required>
                                 </v-text-field>
 
 
                                 <v-text-field v-model="changePassword2"
                                     :append-icon="showChangePassword2 ? 'mdi-eye' : 'mdi-eye-off'"
                                     :rules="[changePasswordRules.required, changePasswordRules.min, changePasswordRules.matchingPasswords]"
-                                    :type="showChangePassword2 ? 'text' : 'password'" :counter="20" label="repeat password"
-                                    hint="At least 8 characters" class="input-group--focused"
+                                    :type="showChangePassword2 ? 'text' : 'password'" :counter="20"
+                                    label="repeat password" hint="At least 8 characters" class="input-group--focused"
                                     @click:append="showChangePassword2 = !showChangePassword2" required>
                                 </v-text-field>
 
@@ -317,8 +318,8 @@
         },
         beforeCreate() {
 
-            //this.$store.commit('initializeStore')
-/*
+            this.$store.commit('initializeStore')
+
             const token = this.$store.state.token
 
             if (token) {
@@ -326,8 +327,8 @@
             } else {
                 this.axios.defaults.headers.common['Authorization'] = null
             }
-*/
 
+            
 
 
         },
@@ -337,8 +338,10 @@
                     this.init()
                 }
                 if (to.name != 'call') {
-                    this.loginCometChat()
-                    this.listenCometChat()
+                    setTimeout(() => {
+                        this.loginCometChat()
+                        this.listenCometChat()
+                    }, 100);
                 }
 
             }
@@ -358,7 +361,7 @@
 
         },
         beforeUpdate() {
-            
+
             this.username = localStorage.username
 
             var showSidebar = this.$store.state.showSidebar
@@ -425,10 +428,10 @@
                 let apiKey = process.env.VUE_APP_COMETCHAT_API_KEY;
 
                 this.$store.commit('setIsLoading', true)
-                var uid = localStorage.user_id;
+                let uid = localStorage.user_id;
 
                 CometChat.login(uid, apiKey).then(
-                    success => {
+                    () => {
                         this.$store.commit('setIsLoading', false)
                         console.log("[CometChat] Login Successful:", {
                             username: uid
@@ -639,18 +642,6 @@
                     this.updateFriendRequests()
                 })
             },
-            updateCometChatUser(username) {
-                let authKey = process.env.VUE_APP_COMETCHAT_AUTH_KEY;
-                var user = new CometChat.User(localStorage.user_id);
-                user.setName(username);
-                CometChat.updateUser(user, authKey).then(
-                    user => {
-                        console.log("[CometChat] User updated", user);
-                    }, error => {
-                        console.log("[CometChat] Error updating user", error);
-                    }
-                )
-            },
             async updateProfile() {
 
                 if (!this.$store.state.isAuthenticated) {
@@ -659,18 +650,21 @@
 
                 var formData = new FormData()
 
+                var headers = {
+                    
+                }
+
                 if (this.update_username.length > 1) {
                     formData.append("username", this.update_username)
+                } else if (this.update_profile_picture == null) {
+                    return
                 }
                 if (this.update_profile_picture != null) {
                     formData.append("image", this.update_profile_picture[0])
+                    headers['Content-Type'] = 'multipart/form-data';
                 }
 
 
-
-                const headers = {
-                    'Content-Type': 'multipart/form-data'
-                }
 
                 this.axios.put("/api/v1/profile/", formData, {
                     headers: headers
@@ -678,8 +672,8 @@
                     this.userErrors = []
                     this.update_profile_picture = null
                     this.accountDialog = false
-                    //this.updateCometChatUser(this.update_username);
                     localStorage.username = this.update_username
+                    this.username = this.update_username
                     this.update_username = ""
 
                 }).catch(error => {

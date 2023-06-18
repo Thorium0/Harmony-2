@@ -94,7 +94,7 @@
                 let authKey = process.env.VUE_APP_COMETCHAT_AUTH_KEY;
                 
                 var uid = user_id;
-                var name = this.username;
+                var name = user_id;
 
                 var user = new CometChat.User(uid);
                 user.setName(name);
