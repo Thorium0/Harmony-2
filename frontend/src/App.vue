@@ -17,7 +17,7 @@
                                 </template>
                                 <v-form @submit.prevent="updateProfile">
 
-                                    <v-text-field v-model="update_username" :counter="10" label="Change username">
+                                    <v-text-field v-model="update_username" :counter="25" label="Change username">
                                     </v-text-field>
 
 
@@ -45,7 +45,7 @@
                         {{ username }}
                         <!--<span class="text-muted">#1234</span>-->
                     </v-card>
-                    <v-dialog v-model="passwordDialog" width="auto">
+                    <v-dialog v-model="passwordDialog" width="300">
                         <v-form @submit.prevent="updatePassword">
 
                             <v-card class="pa-2">
@@ -328,7 +328,7 @@
                 this.axios.defaults.headers.common['Authorization'] = null
             }
 
-            
+
 
 
         },
@@ -642,6 +642,23 @@
                     this.updateFriendRequests()
                 })
             },
+            updateCometChatUser() {
+                let authKey = process.env.VUE_APP_COMETCHAT_AUTH_KEY;
+                let uid = localStorage.user_id;
+                let name = this.update_username;
+
+                var user = new CometChat.User(uid);
+
+                user.setName(name);
+
+                CometChat.updateUser(user, authKey).then(
+                    user => {
+                        console.log("[CometChat] User updated", user);
+                    }, error => {
+                        console.log("[CometChat] Failed to update user", error);
+                    }
+                )
+            },
             async updateProfile() {
 
                 if (!this.$store.state.isAuthenticated) {
@@ -651,7 +668,7 @@
                 var formData = new FormData()
 
                 var headers = {
-                    
+
                 }
 
                 if (this.update_username.length > 1) {
@@ -674,6 +691,7 @@
                     this.accountDialog = false
                     localStorage.username = this.update_username
                     this.username = this.update_username
+                    this.updateCometChatUser()
                     this.update_username = ""
 
                 }).catch(error => {

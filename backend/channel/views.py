@@ -109,6 +109,14 @@ class GroupChannels(APIView):
         
         group_key = "$_"+name+"_"+password
         group = Group.objects.filter(name__regex=f'^\$_{name}_+')
+
+        if len(name.strip()) < 2 or name == None:
+            return Response({"error": "Name is too short"}, status=400)
+        elif len(name) > 20:
+            return Response({"error": "Name is too long"}, status=400)
+        
+        if len(password) > 20:
+            return Response({"error": "Password is too long"}, status=400)
         
         if action == "create":
             if group.exists():

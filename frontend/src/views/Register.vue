@@ -42,9 +42,9 @@
         name: 'RegisterView',
         data() {
             return {
-                username: 'Bendtsen',
-                password: 'kagemand123',
-                password2: 'kagemand123',
+                username: '',
+                password: '',
+                password2: '',
                 errors: [],
 
                 show1: false,
@@ -99,7 +99,7 @@
                 let authKey = process.env.VUE_APP_COMETCHAT_AUTH_KEY;
                 
                 var uid = user_id;
-                var name = user_id;
+                var name = this.username;
 
                 var user = new CometChat.User(uid);
                 user.setName(name);
