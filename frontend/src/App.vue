@@ -160,7 +160,7 @@
 
                         <v-btn height="80px" width="160px" class="mb-2 center" v-if="friend_channels.length"
                             v-for="channel in friend_channels" :to="'/chat/'+ channel.id"
-                            @click="setChannelId(channel.id, channel.friend.username)">
+                            @click="setChannelId(channel.id, channel.friend.username, channel.friend.id)">
                             <v-card height="80px" width="160px">
                                 <v-row align="center" class="mt-1 mb-1">
                                     <v-col class="shrink">
@@ -704,12 +704,18 @@
                     this.group_channels = response.data
                 })
             },
-            setChannelId(channel_id, channel_name = null) {
+            setChannelId(channel_id, channel_name = null, friend_id=null) {
                 this.$store.commit("setSelectedChannelId", channel_id)
                 localStorage.selectedChannelId = channel_id
                 if (channel_name != null) {
                     this.$store.commit("setSelectedChannelName", channel_name)
                     localStorage.selectedChannelName = channel_name
+                }
+                if (friend_id != null) {
+                    localStorage.selectedChannelFriendId = friend_id
+                }
+                else {
+                    localStorage.selectedChannelFriendId = null
                 }
             },
             updatePassword() {

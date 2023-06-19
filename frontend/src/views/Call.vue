@@ -1,6 +1,6 @@
 <template>
     <v-card v-if="waiting">
-        <v-card-title>Calling {{ receiver_id }}...</v-card-title>
+        <v-card-title>Calling {{ channel_name }}...</v-card-title>
     </v-card>
 
     <div id="callScreen"></div>
@@ -17,7 +17,8 @@
             return {
                 username: localStorage.username,
                 uid: "",
-                receiver_id: localStorage.selectedChannelName,
+                channel_name: localStorage.selectedChannelName,
+                receiver_id: localStorage.selectedChannelFriendId,
                 error: false,
                 waiting: false,
             };
@@ -49,6 +50,7 @@
         },
         updated() {
            //$(".bottom-buttons-icon-container").addClass("bottomBtns");
+        
         },
         methods: {
             lowercaseify(string) {
@@ -132,10 +134,10 @@
                 if (!this.receiver_id) this.error = true;
                 this.$store.commit("setIsLoading", true);
                 var globalContext = this;
-                if (this.receiver_id[0] == "$") {
+                if (this.channel_name[0] == "$") {
                     this.waiting = false;
                     console.log(this.waiting)
-                    var sessionID = this.lowercaseify(this.receiver_id.substring(1));
+                    var sessionID = this.lowercaseify(this.channel_name.substring(1));
 
                     let audioOnly = false;
                     let defaultLayout = true;
@@ -199,7 +201,7 @@
 
                 } else {
 
-                    var receiverID = this.lowercaseify(this.receiver_id);
+                    var receiverID = this.receiver_id;
                     var callType = CometChat.CALL_TYPE.VIDEO;
                     var receiverType = CometChat.RECEIVER_TYPE.USER;
                     var call = new CometChat.Call(receiverID, callType, receiverType);
