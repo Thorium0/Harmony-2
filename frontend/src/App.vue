@@ -112,9 +112,8 @@
 
                                     <v-text-field v-model="request_group_password"
                                         :append-icon="groupPassShow ? 'mdi-eye' : 'mdi-eye-off'"
-                                        :rules="[groupRules.required, groupRules.min]"
                                         :type="groupPassShow ? 'text' : 'password'" :counter="20"
-                                        hint="At least 8 characters" @click:append="groupPassShow = !groupPassShow"
+                                        @click:append="groupPassShow = !groupPassShow"
                                         label="password" required>
                                     </v-text-field>
 
